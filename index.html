@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dental Treatment Quotation</title>
+<style>
+:root {
+  --bg-page:#f5f5f2;--bg-card:#fff;--bg-surface:#f0ede6;--bg-info:#e6f1fb;--bg-success:#eaf3de;--bg-purple:#eeedfe;
+  --text-pri:#1a1a18;--text-sec:#5f5e5a;--text-ter:#8a8880;
+  --text-info:#185fa5;--text-success:#2f6010;--text-cash:#b06000;--text-mv:#1479b8;--text-purple:#534ab7;
+  --border-lt:rgba(0,0,0,.11);--border-md:rgba(0,0,0,.24);
+  --r-sm:6px;--r-md:8px;--r-lg:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg-page:#1a1a18;--bg-card:#242422;--bg-surface:#2c2c2a;--bg-info:#0c2a44;--bg-success:#172d06;--bg-purple:#26215c;
+    --text-pri:#f0ede6;--text-sec:#a8a49e;--text-ter:#706d68;
+    --text-info:#78bbf0;--text-success:#7aba3a;--text-cash:#e09030;--text-mv:#5ab0f0;--text-purple:#afa9ec;
+    --border-lt:rgba(255,255,255,.09);--border-md:rgba(255,255,255,.21);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-page);color:var(--text-pri);padding:1.5rem 1rem;font-size:14px;line-height:1.5;min-height:100vh}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:21px;font-weight:600}
+h2{font-size:15px;font-weight:600;color:var(--text-pri)}
+.lbl{font-size:10px;color:var(--text-ter);text-transform:uppercase;letter-spacing:.1em}
+.card{background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:8px}
+.card.active{border-color:var(--border-md)}
+.badge{font-size:10px;font-family:ui-monospace,monospace;background:var(--bg-surface);padding:2px 7px;border-radius:5px;color:var(--text-sec);font-weight:600;white-space:nowrap}
+.tbadge{font-size:10px;background:var(--bg-surface);padding:1px 6px;border-radius:4px;color:var(--text-ter)}
+.pname{font-size:13px;font-weight:600}
+.pmeta{font-size:11px;color:var(--text-sec);margin-top:2px;line-height:1.6}
+.mv{color:var(--text-mv)} .cv{color:var(--text-cash)} .sv{color:var(--text-success)}
+input[type=checkbox]{width:15px;height:15px;cursor:pointer;flex-shrink:0;margin-top:2px;accent-color:#1479b8}
+input[type=radio]{width:13px;height:13px;cursor:pointer;accent-color:#1479b8}
+input[type=number]{width:70px;font-size:12px;text-align:center;border:0.5px solid var(--border-md);border-radius:var(--r-sm);padding:4px 5px;background:var(--bg-card);color:var(--text-pri)}
+input[type=text]{font-size:14px;border:0.5px solid var(--border-lt);border-radius:var(--r-sm);padding:6px 10px;background:var(--bg-card);color:var(--text-pri);flex:1}
+input.fee{width:80px;font-size:12px;border:0.5px solid var(--border-md);border-radius:var(--r-sm);padding:4px 6px;background:var(--bg-card);color:var(--text-pri)}
+input[type=text]:focus,input[type=number]:focus,input.fee:focus{outline:2px solid #1479b8;outline-offset:1px}
+.sep{border-top:0.5px solid var(--border-lt);margin-top:10px;padding-top:10px}
+.row{display:flex;align-items:flex-start;gap:12px}
+.line-tot{display:flex;gap:18px;font-size:12px;flex-wrap:wrap}
+.sec-label{font-size:10px;color:var(--text-ter);text-transform:uppercase;letter-spacing:.1em;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{padding:8px 10px;text-align:right;font-weight:600;color:var(--text-sec);background:var(--bg-surface);border-bottom:0.5px solid var(--border-lt);font-size:11px}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 10px;text-align:right;border-top:0.5px solid var(--border-lt);vertical-align:top}
+tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font-weight:600}
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
+.metric{background:var(--bg-surface);border-radius:var(--r-md);padding:13px}
+.mlabel{font-size:11px;color:var(--text-sec);margin-bottom:3px}
+.mval{font-size:20px;font-weight:600}
+.msub{font-size:10px;color:var(--text-ter);margin-top:2px}
+.btn{font-size:12px;padding:8px 16px;border:0.5px solid var(--border-md);background:var(--bg-card);color:var(--text-pri);border-radius:var(--r-md);cursor:pointer;font-family:inherit;font-weight:500}
+.btn:hover{background:var(--bg-surface)} .btn:disabled{opacity:.38;cursor:not-allowed}
+.btn-p{background:#1479b8;color:#fff;border-color:#1479b8}.btn-p:hover{background:#0f5f94}
+.info-box{font-size:11px;background:var(--bg-info);color:var(--text-info);padding:8px 11px;border-radius:var(--r-md);margin-top:8px;line-height:1.6}
+.ptrow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);margin-bottom:10px}
+.ptlbl{font-size:12px;color:var(--text-sec);min-width:90px;flex-shrink:0;font-weight:500}
+.divider{border:none;border-top:1.5px solid var(--border-lt);margin:1.75rem 0 1.25rem}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;cursor:pointer;user-select:none}
+.section-header:hover .collapse-btn{border-color:var(--border-md)}
+.collapse-btn{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:0.5px solid var(--border-lt);background:var(--bg-surface);color:var(--text-ter);font-size:11px;flex-shrink:0;margin-left:auto;transition:transform .2s}
+.collapse-btn.collapsed{transform:rotate(-90deg)}
+.collapsible{overflow:hidden;transition:opacity .2s}
+.collapsible.collapsed{display:none}
+.section-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
+.tag-surgical{background:var(--bg-info);color:var(--text-info)}
+.tag-nonsurg{background:var(--bg-success);color:var(--text-success)}
+.tag-ortho{background:#fde8f5;color:#9c27b0}
+@media(prefers-color-scheme:dark){.tag-ortho{background:#3d1a45;color:#e090d8}}
+.chas-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);margin-bottom:12px}
+.chas-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border-md);background:var(--bg-surface);color:var(--text-sec);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chas-btn.sel-none{border-color:var(--border-md);background:var(--bg-surface);color:var(--text-pri)}
+.chas-btn.sel-orange{border-color:#c07000;background:#fff7ed;color:#b06000}
+.chas-btn.sel-blue{border-color:#1479b8;background:#e6f1fb;color:#185fa5}
+.chas-btn.sel-mg{border-color:#7a5c0a;background:#fef9ec;color:#6b4d08}
+.chas-btn.sel-pg{border-color:#2f6010;background:#eaf3de;color:#2f6010}
+@media(prefers-color-scheme:dark){
+  .chas-btn.sel-orange{background:#3a2200;color:#e09030}
+  .chas-btn.sel-blue{background:#0c2a44;color:#78bbf0}
+  .chas-btn.sel-mg{background:#2a1c00;color:#c9980a}
+  .chas-btn.sel-pg{background:#172d06;color:#7aba3a}
+}
+.rem-input{width:52px;font-size:11px;text-align:center;border:0.5px solid var(--border-md);border-radius:var(--r-sm);padding:3px 4px;background:var(--bg-card);color:var(--text-pri)}
+.climit{font-size:10px;color:var(--text-ter);font-style:italic;margin-top:2px}
+#sum-nonsurg{display:none}
+#summary-section{display:none}
+@media print{
+  body{background:#fff;color:#000;padding:.5rem}
+  .no-print{display:none!important}
+  #summary-section,#sum-nonsurg{display:block!important}
+  .card{border:1px solid #ccc;break-inside:avoid}
+  .metric{background:#f5f5f5}
+  .info-box{background:#e8f4fd;color:#0a4a80}
+}
+</style>
+</head>
+<body>
+<!-- ── SIGNING PAGE (shown when ?sign= param present) ── -->
+<div id="signing-page" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem;box-sizing:border-box">
+  <div style="width:100%;max-width:480px;text-align:center;margin-bottom:1rem">
+    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Dental Treatment Quotation</div>
+    <h2 style="font-size:18px;font-weight:600;color:#1a1a18;margin:0">Please sign below</h2>
+    <p style="font-size:12px;color:#666;margin-top:4px">Draw your signature in the box using your finger</p>
+  </div>
+  <canvas id="sig-canvas" style="width:100%;max-width:480px;height:200px;border:1.5px solid #ccc;border-radius:10px;background:#fafaf8;touch-action:none;cursor:crosshair;display:block"></canvas>
+  <div style="display:flex;gap:10px;margin-top:1rem;width:100%;max-width:480px">
+    <button id="sig-clear-btn" style="flex:1;padding:12px;font-size:14px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit">Clear</button>
+    <button id="sig-submit-btn" style="flex:2;padding:12px;font-size:14px;font-weight:600;border:none;border-radius:8px;background:#1479b8;color:#fff;cursor:pointer;font-family:inherit">Submit Signature</button>
+  </div>
+  <p id="sig-msg" style="text-align:center;font-size:12px;color:#666;margin-top:8px;min-height:18px"></p>
+</div>
+
+<!-- ── QR MODAL (shown on desktop while waiting) ── -->
+<div id="qr-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:8888;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:2rem;text-align:center;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px;color:#1a1a18">Patient Signature</div>
+    <p style="font-size:12px;color:#666;margin-bottom:1.25rem">Ask the patient to scan this QR code with their phone to sign</p>
+    <div id="qr-code" style="display:inline-block;padding:10px;border:1px solid #eee;border-radius:8px;margin-bottom:1rem"></div>
+    <div id="qr-status" style="font-size:12px;color:#1479b8;margin-bottom:1.25rem;min-height:18px">Waiting for patient to sign…</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeQrModal()" style="flex:1;padding:9px;font-size:12px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- Header -->
+<div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--border-lt);display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+  <img src="data:image/png;base64,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" alt="Nofrills Dental" style="height:52px;width:auto;flex-shrink:0">
+  <div>
+    <h1 style="margin:0">Dental Treatment Quotation</h1>
+    <div class="lbl" style="margin-top:3px">Medisave · CHAS · Cash</div>
+  </div>
+</div>
+
+<!-- Patient fields -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem">
+  <div class="ptrow" style="flex:1;min-width:200px;margin-bottom:0">
+    <span class="ptlbl">Patient name</span>
+    <input type="text" id="patient-name" placeholder="Enter patient name…">
+  </div>
+  <div class="ptrow" style="flex:1;min-width:200px;margin-bottom:0">
+    <span class="ptlbl">Doctor</span>
+    <select id="doctor-name" style="font-size:14px;border:0.5px solid var(--border-lt);border-radius:var(--r-sm);padding:6px 10px;background:var(--bg-card);color:var(--text-pri);flex:1;cursor:pointer;outline:none">
+      <option value="Dr Benedict Wong" selected>Dr Benedict Wong</option>
+    </select>
+  </div>
+</div>
+
+<!-- ═══ SURGICAL SECTION ═══ -->
+<div class="section-header no-print" onclick="toggleSection('surg')">
+  <span class="section-tag tag-surgical">Surgical Procedures</span>
+  <span style="font-size:12px;color:var(--text-sec)">Medisave-claimable · CPF Apr 2025 limits</span>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <button class="btn" style="font-size:10px;padding:3px 10px;color:var(--text-sec)" onclick="event.stopPropagation();clearSection('surg')">Clear all</button>
+    <button class="collapse-btn" id="surg-chevron" tabindex="-1">▾</button>
+  </div>
+</div>
+<div id="surg-collapsible" class="collapsible no-print">
+<div id="surg-list"></div>
+</div>
+
+<!-- Surgical summary removed — see combined Summary below -->
+
+<!-- ═══ NON-SURGICAL SECTION ═══ -->
+<hr class="divider">
+<div class="section-header no-print" onclick="toggleSection('nonsurg')">
+  <span class="section-tag tag-nonsurg">Non-Surgical Procedures</span>
+  <span style="font-size:12px;color:var(--text-sec)">CHAS-subsidised · Oct 2025 rates</span>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <button class="btn" style="font-size:10px;padding:3px 10px;color:var(--text-sec)" onclick="event.stopPropagation();clearSection('nonsurg')">Clear all</button>
+    <button class="collapse-btn" id="nonsurg-chevron" tabindex="-1">▾</button>
+  </div>
+</div>
+<div id="nonsurg-collapsible" class="collapsible no-print">
+<!-- CHAS tier selector -->
+<div class="chas-selector no-print">
+  <button class="chas-btn sel-none" id="chas-none"  onclick="setChas('none')"  >No CHAS</button>
+  <button class="chas-btn"          id="chas-orange" onclick="setChas('orange')">🟠 Orange</button>
+  <button class="chas-btn"          id="chas-blue"   onclick="setChas('blue')"  >🔵 Blue</button>
+  <button class="chas-btn"          id="chas-mg"     onclick="setChas('mg')"    >⭐ Merdeka Gen</button>
+  <button class="chas-btn"          id="chas-pg"     onclick="setChas('pg')"    >🌟 Pioneer Gen</button>
+  <span style="font-size:10px;color:var(--text-ter);margin-left:4px">Applies to all selected procedures</span>
+</div>
+<div id="nonsurg-list"></div>
+</div>
+
+<!-- ═══ ORTHODONTICS SECTION ═══ -->
+<hr class="divider">
+<div class="section-header no-print" onclick="toggleSection('ortho')">
+  <span class="section-tag tag-ortho">Orthodontics</span>
+  <span style="font-size:12px;color:var(--text-sec)">No CHAS · No Medisave · Cash only</span>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <button class="btn" style="font-size:10px;padding:3px 10px;color:var(--text-sec)" onclick="event.stopPropagation();clearSection('ortho')">Clear all</button>
+    <button class="collapse-btn" id="ortho-chevron" tabindex="-1">▾</button>
+  </div>
+</div>
+<div id="ortho-collapsible" class="collapsible no-print">
+  <div id="ortho-list"></div>
+</div>
+
+<!-- ═══ PROSTHODONTIC SECTION ═══ -->
+<hr class="divider">
+<div class="section-header no-print" onclick="toggleSection('prostho')">
+  <span class="section-tag" style="background:var(--bg-purple);color:var(--text-purple);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;letter-spacing:.04em">Additional Prosthesis</span>
+  <span style="font-size:12px;color:var(--text-sec)">Additional components · No CHAS · Cash only</span>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+    <button class="btn" style="font-size:10px;padding:3px 10px;color:var(--text-sec)" onclick="event.stopPropagation();clearSection('prostho')">Clear all</button>
+    <button class="collapse-btn" id="prostho-chevron" tabindex="-1">▾</button>
+  </div>
+</div>
+<div id="prostho-collapsible" class="collapsible no-print">
+  <div id="prostho-list"></div>
+</div>
+
+<!-- ═══ SUMMARY ═══ -->
+<div id="combined-summary" style="display:none">
+  <hr class="divider">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+    <span style="font-size:15px;font-weight:600;color:var(--text-pri)">Summary</span>
+    <span style="font-size:11px;color:var(--text-sec)">All selected treatments</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0" class="no-print">
+      <input type="checkbox" id="gst-toggle" onchange="render()" style="width:14px;height:14px;accent-color:#1479b8;cursor:pointer">
+      <label for="gst-toggle" style="font-size:12px;cursor:pointer;font-weight:500">Add 9% GST</label>
+      <span style="font-size:10px;color:var(--text-ter)">(cash only)</span>
+    </div>
+  </div>
+
+  <div style="background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34%;text-align:left">Treatment</th>
+          <th style="width:6%">Qty</th>
+          <th style="width:15%">Total Fee</th>
+          <th style="width:15%">Medisave</th>
+          <th style="width:13%">CHAS</th>
+          <th style="width:17%">Cash payable</th>
+        </tr>
+      </thead>
+      <tbody id="combined-tbody"></tbody>
+      <tfoot>
+        <tr style="border-top:2px solid var(--border-md)">
+          <td colspan="2" style="font-size:13px"><strong>Grand total</strong></td>
+          <td id="cs-fee-total" style="font-size:13px;font-weight:600"></td>
+          <td id="cs-mv-total" class="mv" style="font-size:13px;font-weight:600"></td>
+          <td id="cs-chas-total" class="sv" style="font-size:13px;font-weight:600"></td>
+          <td id="cs-cash-total" class="cv" style="font-size:13px;font-weight:600"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Grand metric cards -->
+  <div class="mgrid">
+    <div class="metric"><div class="mlabel">Grand total fee</div><div class="mval" id="gm-total">$0</div><div class="msub" id="gm-total-sub">incl. GST</div></div>
+    <div class="metric" style="border:1px solid var(--border-lt)">
+      <div class="mlabel">Patient pays cash</div>
+      <div class="mval cv" id="gm-cash">$0</div>
+      <div class="msub" id="gm-cash-sub">after Medisave + CHAS</div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Subsidies applied</div>
+      <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-top:3px">
+        <span class="mv" style="font-size:15px;font-weight:600" id="gm-mv">$0</span>
+        <span style="font-size:11px;color:var(--text-sec)">Medisave</span>
+        <span class="sv" style="font-size:15px;font-weight:600" id="gm-chas">$0</span>
+        <span style="font-size:11px;color:var(--text-sec)">CHAS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GST breakdown note (only when GST on) -->
+  <div id="gst-mv-note" style="display:none;font-size:11px;color:var(--text-sec);background:var(--bg-surface);border-radius:var(--r-md);padding:9px 14px;margin-bottom:12px;line-height:1.7">
+    <span style="font-weight:600">GST breakdown: </span>
+    GST on Medisave (<span id="gn-mv-amt"></span>) = <span id="gn-mv-gst" class="cv"></span> added to cash ·
+    GST on cash top-up = <span id="gn-cash-gst" class="cv"></span> ·
+    Total cash payable = <span id="gn-cash-total" class="cv" style="font-weight:600"></span>
+  </div>
+
+  <!-- Instalment panel -->
+  <div style="background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <input type="checkbox" id="instalment-toggle" onchange="updateInstalmentPanel()" style="width:15px;height:15px;accent-color:#1479b8;cursor:pointer">
+      <label for="instalment-toggle" style="font-size:13px;font-weight:500;cursor:pointer">Show instalment plan</label>
+      <span style="font-size:11px;color:var(--text-ter)">(cash top-up + GST on cash top-up only)</span>
+    </div>
+    <div id="instalment-panel" style="display:none">
+      <div id="inst-upfront-note" style="display:none;font-size:11px;color:var(--text-sec);background:var(--bg-surface);border-radius:var(--r-md);padding:8px 12px;margin-bottom:10px;line-height:1.6">
+        <span style="font-weight:600;color:var(--text-cash)">⚠ Pay upfront on day of appointment: </span>
+        GST on Medisave amount = <span class="cv" style="font-weight:600" id="inst-upfront-amt"></span> — this is not eligible for instalment.
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500">Instalment period</span>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+          <input type="radio" name="inst-months" value="3"  onchange="updateInstalmentPanel()" style="accent-color:#1479b8"> 3 months
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+          <input type="radio" name="inst-months" value="6"  onchange="updateInstalmentPanel()" style="accent-color:#1479b8" checked> 6 months
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+          <input type="radio" name="inst-months" value="12" onchange="updateInstalmentPanel()" style="accent-color:#1479b8"> 12 months
+        </label>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="metric" style="flex:1;min-width:140px">
+          <div class="mlabel">Instalment-eligible amount</div>
+          <div class="mval cv" id="inst-total">$0</div>
+          <div class="msub">cash top-up + GST on cash top-up</div>
+        </div>
+        <div class="metric" style="flex:1;min-width:140px;background:var(--bg-info)">
+          <div class="mlabel" style="color:var(--text-info)">Monthly instalment</div>
+          <div class="mval" style="color:var(--text-info)" id="inst-monthly">$0</div>
+          <div class="msub" id="inst-label">per month for 6 months</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acknowledgement + Signature -->
+  <div id="ack-block" style="margin-top:1.5rem;padding:1.25rem 1.5rem;border:0.5px solid var(--border-lt);border-radius:var(--r-lg);background:var(--bg-card)">
+    <p id="ack-text" style="font-size:13px;color:var(--text-pri);line-height:1.7;margin-bottom:1.5rem">
+      I, <span id="ack-name" style="font-weight:600;border-bottom:1px solid var(--border-md);padding-bottom:1px;min-width:120px;display:inline-block">&nbsp;</span>, acknowledge that this quotation form has been explained clearly to me.
+    </p>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:180px">
+        <div id="sig-image-area" style="border-bottom:1px solid var(--text-pri);height:50px;margin-bottom:6px;display:flex;align-items:flex-end;padding-bottom:2px"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="sig-label" style="font-size:11px;color:var(--text-sec)">Patient's signature</span>
+          <button id="get-sig-btn" onclick="generateSigningQR()" class="no-print" style="font-size:10px;padding:2px 9px;border:0.5px solid var(--border-md);background:var(--bg-info);color:var(--text-info);border-radius:20px;cursor:pointer;font-family:inherit;font-weight:500">Get signature</button>
+          <button id="clear-sig-btn" onclick="clearSignature()" class="no-print" style="display:none;font-size:10px;padding:2px 9px;border:0.5px solid var(--border-md);background:var(--bg-surface);color:var(--text-sec);border-radius:20px;cursor:pointer;font-family:inherit">Clear</button>
+        </div>
+      </div>
+      <div style="flex:1;min-width:180px">
+        <div style="border-bottom:1px solid var(--text-pri);height:50px;margin-bottom:6px;display:flex;align-items:flex-end;padding-bottom:4px">
+          <span id="sig-date" style="font-size:13px;color:var(--text-pri)"></span>
+        </div>
+        <div style="font-size:11px;color:var(--text-sec)">Date</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Buttons -->
+<div style="display:flex;gap:8px;flex-wrap:wrap" class="no-print">
+  <button class="btn btn-p" id="btn-excel" disabled onclick="exportExcel()">⬇ Download Excel</button>
+  <button class="btn" id="btn-print" disabled onclick="printQuote()">🖨 Print / PDF</button>
+</div>
+
+<div style="font-size:10px;color:var(--text-ter);line-height:1.7;border-top:0.5px solid var(--border-lt);padding-top:12px;margin-top:16px" class="no-print">
+  <strong>Medisave (CPF, Apr 2025):</strong> SB816M = $1,120 surgical + $830 misc per session (misc once per appointment) · SB803M/SB813M = $1,950/unit · SB802M = $2,220/unit · SF812T = $420 surgical + $830 misc = $1,250/tooth · SF813T = $1,120 surgical + $830 misc = $1,950/tooth · Socket Preservation = not Medisave-claimable<br>
+  <strong>CHAS (MOH, Oct 2025):</strong> Subsidy applied to subsidised units = min(qty, remaining claims). Subsidy cannot exceed fee charged.<br>
+  <strong>GST (9%):</strong> Applied to the full fee including Medisave amount. GST on Medisave portion is added to patient's cash payable. GST on CHAS subsidy portion is not charged to patient.<br>
+  Subject to CPF/MOH approval. All amounts in SGD.
+</div>
+
+</div><!-- .wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+
+const SURG = [
+  { code:"SB816M", name:"Dental Implant + Crown", tosp:"Table 2C",
+    surgical:1120, misc:830, unit:"per implant", implantMode:true, implantOnly:false,
+    crowns:[{label:"PFM Crown",cash:0},{label:"Zirconia Crown",cash:550}] },
+  { code:"SB816M_IO", name:"Dental Implant ONLY", tosp:"Table 2C",
+    surgical:1120, misc:830, unit:"per implant", implantMode:true, implantOnly:true },
+  { code:"SB803M", name:"GBR", tosp:"Table 2C",
+    medisave:1950, breakdown:"$1,120+$830 misc", unit:"per procedure" },
+  { code:"SB802M", name:"Complex Sinus Lift", tosp:"Table 3A",
+    medisave:2220, breakdown:"$1,390+$830 misc", unit:"per procedure" },
+  { code:"SB813M", name:"Alveolectomy", tosp:"Table 2C",
+    medisave:1950, breakdown:"$1,120+$830 misc", unit:"per quadrant" },
+  { code:"SF812T", name:"Surgical Tooth Removal — bone removal, no tooth division", tosp:"Table 1B",
+    medisave:1250, breakdown:"$420 surgical + $830 misc", unit:"per tooth" },
+  { code:"SF813T", name:"Surgical Tooth Removal — bone removal + tooth division", tosp:"Table 2C",
+    medisave:1950, breakdown:"$1,120 surgical + $830 misc", unit:"per tooth" },
+  { code:"SOCKPRES", name:"Socket Preservation", tosp:"Non-Medisave",
+    feeOnly:true, unit:"per socket" },
+  { code:"SIMGRAFT", name:"Simultaneous Bone Graft", tosp:"Non-Medisave",
+    feeOnly:true, unit:"per procedure" },
+]
+
+// CHAS subsidy per tier: [Orange, Blue, MG, PG]
+const NS = [
+  // ── Preventive ──
+  { id:"scale",    name:"Scaling and Polishing",                           unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[15.50,23.50,28.50,33.50] },
+  { id:"fluor",    name:"Fluoride Treatment",                              unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[5.50,8.50,11,13.50] },
+  { id:"sealant",  name:"Pit and Fissure Sealant",                         unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4 teeth/yr; permanent molars only",                      subs:[5,7.50,8.50,9.50] },
+  // ── X-rays ──
+  { id:"xray_pa",  name:"Periapical X-ray",                                unit:"per film",      maxClaims:4,  claimNote:"Up to 4 films/yr",                                             subs:[3,4.50,5,5.50] },
+  { id:"xray_bw",  name:"Bitewing X-ray",                                  unit:"per film",      maxClaims:4,  claimNote:"Up to 4 films/yr (shared with periapical)",                    subs:[3,4.50,5,5.50] },
+  { id:"xray_opg", name:"Panoramic X-ray (OPG)",                           unit:"per film",      maxClaims:1,  claimNote:"Up to 1/yr",                                                   subs:[15.50,23.50,26,28.50] },
+  // ── Fillings ──
+  { id:"fill_ca",  name:"Composite Filling — Anterior",                    unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[27.50,41,44,47] },
+  { id:"fill_cp1", name:"Composite Filling — Posterior (1 surface)",       unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[44,66,71,76] },
+  { id:"fill_cp2", name:"Composite Filling — Posterior (2+ surfaces)",     unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[60,90,96,102] },
+  { id:"fill_am1", name:"Amalgam Filling — Posterior (1 surface)",         unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[27.50,41,44,47] },
+  { id:"fill_am2", name:"Amalgam Filling — Posterior (2+ surfaces)",       unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[36,54,57.50,61] },
+  // ── Periodontal ──
+  { id:"srp",      name:"Scaling and Root Planing",                        unit:"per quadrant",  maxClaims:4,  claimNote:"Up to 4 quadrants/yr",                                         subs:[60,90,96,102] },
+  // ── Extractions ──
+  { id:"ext_a",    name:"Extraction — Anterior",                           unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ posterior extractions",                   subs:[19,28.50,33.50,38.50] },
+  { id:"ext_p",    name:"Extraction — Posterior",                          unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ anterior extractions",                    subs:[45.50,68.50,73.50,78.50] },
+  // ── Root Canal Treatment ──
+  { id:"rct_a",    name:"Root Canal Treatment — Anterior",                 unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[217.50,326,331,336] },
+  { id:"rct_pm",   name:"Root Canal Treatment — Pre-molar",                unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[308.50,462.50,467.50,472.50] },
+  { id:"rct_m",    name:"Root Canal Treatment — Molar",                    unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[389.50,584.50,589.50,594.50] },
+  // ── Crown ──
+  { id:"crown",    name:"Permanent Crown",                                 unit:"per crown",     maxClaims:4,  claimNote:"Up to 4/yr; natural teeth only, not implant-supported",         subs:[410,615,620,625] },
+  // ── Dentures ──
+  { id:"pd_s",     name:"Partial Denture — Simple (< 6 teeth)",            unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[202.50,304,309,314],    hasMaterials:true },
+  { id:"pd_c",     name:"Partial Denture — Complex (≥ 6 teeth)",           unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[257,385.50,390.50,395.50], hasMaterials:true },
+  { id:"cd",       name:"Complete Denture (Upper or Lower)",                unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[272.50,408.50,413.50,418.50], hasMaterials:true },
+]
+
+const DENTURE_MATERIALS = ["Acrylic", "Flexible", "CoCr", "Implant Overdenture"]
+
+// Prosthodontic extras — no CHAS, no checkbox toggle (always rendered), fee + qty + remark
+const PROSTHO = [
+  { id:"dent_comp",  name:"Denture",  unit:"per unit", materials:["Acrylic","Flexible","CoCr","Implant Overdenture"] },
+  { id:"crown_comp", name:"Crown",    unit:"per unit", materials:["Natural Tooth","Implant"] },
+]
+
+// Orthodontics — no CHAS, no Medisave, cash only
+const ORTHO = [
+  { id:"metal_braces",   name:"Metal Braces",   unit:"per case" },
+  { id:"clear_aligners", name:"Clear Aligners",  unit:"per case" },
+]
+
+const CHAS_TIERS = ["orange","blue","mg","pg"]
+const CHAS_IDX   = {none:-1,orange:0,blue:1,mg:2,pg:3}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+
+const surgState = {}
+SURG.forEach(p => { surgState[p.code] = { on:false, qty:1, crown:0, apptMode:"same", cashTopup:0 } })
+
+const nsState = {}
+NS.forEach(p => { nsState[p.id] = { on:false, qty:1, fee:0, remaining:p.maxClaims, materials:[] } })
+
+const prosthoState = {}
+PROSTHO.forEach(p => { prosthoState[p.id] = { qty:1, fee:0, remark:"", materials:[] } })
+
+const orthoState = {}
+ORTHO.forEach(p => { orthoState[p.id] = { qty:1, fee:0, remark:"" } })
+
+let chasMode = "none"
+
+// ── HELPERS ─────────────────────────────────────────────────────────────────
+
+function fmt(n){ return "$"+Math.round(n*100)/100 === Math.round(n) ? "$"+Math.round(n).toLocaleString() : "$"+(Math.round(n*100)/100).toFixed(2) }
+function fmtD(n){ return "$"+(Math.round(n*100)/100).toLocaleString("en-SG",{minimumFractionDigits:2,maximumFractionDigits:2}) }
+function gst(){ return document.getElementById("gst-toggle").checked }
+function getToday(){ return new Date().toLocaleDateString("en-SG",{day:"2-digit",month:"short",year:"numeric"}) }
+document.getElementById("today-date") && (document.getElementById("today-date").textContent = getToday())
+const sigDate = document.getElementById("sig-date")
+if(sigDate) sigDate.textContent = getToday()
+
+// Keep acknowledgement name in sync with patient name input
+document.getElementById("patient-name").addEventListener("input", function(){
+  const ackName = document.getElementById("ack-name")
+  if(ackName) ackName.textContent = this.value || "\u00a0"
+})
+
+function getChasSubsidy(p){
+  const idx = CHAS_IDX[chasMode]
+  if(idx < 0) return 0
+  return p.subs[idx]
+}
+
+function getSurgLine(p){
+  const s = surgState[p.code], qty = s.qty, hasGst = gst()
+  if(p.feeOnly){
+    const cb = (parseFloat(s.cashTopup)||0) * qty
+    const cashTotal = hasGst ? cb * 1.09 : cb
+    // No Medisave, so entire cash (incl. GST) is instalment-eligible
+    return { qty, mv:0, gstOnMv:0, cashBefore:cb, cashTotal, total:cashTotal, extraMisc:0, instEligible:cashTotal }
+  }
+  if(p.implantMode){
+    if(p.implantOnly){
+      const costPer = parseFloat(s.cashTopup)||0   // cashTopup field reused as costPerImplant
+      const totalFee = costPer * qty
+      // Medisave is always same-session logic (no appt toggle): 1120×qty + 830 once
+      const mv = p.surgical*qty + p.misc
+      if(costPer === 0){
+        // No cost entered — show Medisave only, $0 cash
+        const gstOnMv = hasGst ? mv * 0.09 : 0
+        return { qty, mv, gstOnMv, cashBefore:0, cashTotal:gstOnMv, total:mv+gstOnMv, extraMisc:0, instEligible:0 }
+      }
+      // Total fee incl GST = costPer × qty × (1+GST)
+      const totalFeeWithGst = hasGst ? totalFee * 1.09 : totalFee
+      // Cash = total fee (incl GST) - Medisave (Medisave is fixed, no GST deducted from it)
+      const cashTotal = Math.max(0, totalFeeWithGst - mv)
+      // GST on Medisave = portion of overall GST attributable to Medisave amount
+      const gstOnMv = hasGst ? mv * 0.09 : 0
+      // instEligible = cash - gstOnMv (cash top-up portion only)
+      const instEligible = Math.max(0, cashTotal - gstOnMv)
+      return { qty, mv, gstOnMv, cashBefore:Math.max(0,totalFee-mv), cashTotal, total:hasGst?totalFeeWithGst:totalFee, extraMisc:0, instEligible }
+    }
+    const ccp = p.crowns[s.crown].cash
+    const extraCash = parseFloat(s.cashTopup)||0  // additional cash top-up per implant
+    if(s.apptMode === "same"){
+      const mv = p.surgical*qty + p.misc
+      const extraMisc = p.misc*(qty-1)
+      const cashBefore = extraMisc + (ccp + extraCash)*qty
+      const gstOnMv = hasGst ? mv * 0.09 : 0
+      const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+      const cashTotal = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc, instEligible:cashTopupWithGst }
+    } else {
+      const mv = (p.surgical+p.misc)*qty
+      const cashBefore = (ccp + extraCash)*qty
+      const gstOnMv = hasGst ? mv * 0.09 : 0
+      const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+      const cashTotal = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst }
+    }
+  } else {
+    const mv = p.medisave*qty
+    const cashBefore = (parseFloat(surgState[p.code].cashTopup)||0)*qty
+    const gstOnMv = hasGst ? mv * 0.09 : 0
+    const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+    const cashTotal = cashTopupWithGst + gstOnMv
+    return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst }
+  }
+}
+
+function getNsLine(p){
+  const s = nsState[p.id], qty = s.qty, feePerUnit = parseFloat(s.fee)||0
+  const totalFee = feePerUnit * qty
+  const subsPerUnit = getChasSubsidy(p)
+  // Clamp subsidy per unit to fee per unit
+  const effectiveSub = Math.min(subsPerUnit, feePerUnit)
+  // How many units get subsidy
+  const subsidisedQty = Math.min(qty, Math.max(0, parseInt(s.remaining)||0))
+  const subsidyTotal = effectiveSub * subsidisedQty
+  const cashBefore = totalFee - subsidyTotal
+  const g = gst() ? 1.09 : 1.0
+  return { qty, totalFee, subsidyTotal, cashTotal:cashBefore*g, cashBefore, total:subsidyTotal+cashBefore*g, subsidisedQty, effectiveSub }
+}
+
+// ── CHAS TIER UI ─────────────────────────────────────────────────────────────
+
+function setChas(mode){
+  chasMode = mode
+  CHAS_TIERS.concat(["none"]).forEach(t => {
+    const btn = document.getElementById("chas-"+t)
+    if(!btn) return
+    btn.className = "chas-btn"+(t===mode?" sel-"+t:"")
+  })
+  render()
+}
+setChas("none")
+
+// ── COLLAPSE ─────────────────────────────────────────────────────────────────
+
+const collapseState = { surg: false, nonsurg: false, ortho: false, prostho: false }
+
+function toggleSection(sec) {
+  collapseState[sec] = !collapseState[sec]
+  const idMap = { surg:'surg-collapsible', nonsurg:'nonsurg-collapsible', ortho:'ortho-collapsible', prostho:'prostho-collapsible' }
+  const col = document.getElementById(idMap[sec])
+  const btn = document.getElementById(sec + '-chevron')
+  if (collapseState[sec]) {
+    col.classList.add('collapsed')
+    btn.classList.add('collapsed')
+  } else {
+    col.classList.remove('collapsed')
+    btn.classList.remove('collapsed')
+  }
+}
+
+function clearSection(sec) {
+  if (sec === 'surg') {
+    SURG.forEach(p => {
+      surgState[p.code].on = false
+      surgState[p.code].qty = 1
+      surgState[p.code].crown = 0
+      surgState[p.code].apptMode = "same"
+      surgState[p.code].cashTopup = 0
+    })
+  } else if (sec === 'nonsurg') {
+    NS.forEach(p => {
+      nsState[p.id].on = false
+      nsState[p.id].qty = 1
+      nsState[p.id].fee = 0
+      nsState[p.id].remaining = p.maxClaims
+      nsState[p.id].materials = []
+    })
+  } else if (sec === 'ortho') {
+    ORTHO.forEach(p => {
+      orthoState[p.id].qty = 1
+      orthoState[p.id].fee = 0
+      orthoState[p.id].remark = ""
+    })
+  } else if (sec === 'prostho') {
+    PROSTHO.forEach(p => {
+      prosthoState[p.id].qty = 1
+      prosthoState[p.id].fee = 0
+      prosthoState[p.id].remark = ""
+      prosthoState[p.id].materials = []
+    })
+  }
+  render()
+}
+
+// ── RENDER SURGICAL ──────────────────────────────────────────────────────────
+
+function renderSurg(){
+  const list = document.getElementById("surg-list") || document.querySelector("#surg-collapsible #surg-list")
+  list.innerHTML = ""
+  SURG.forEach(p => {
+    const s = surgState[p.code], l = getSurgLine(p)
+    const div = document.createElement("div")
+    div.className = "card"+(s.on?" active":"")
+
+    let meta = p.feeOnly
+      ? `<span style="color:var(--text-ter)">No Medisave · Cash only · ${p.unit}</span>`
+      : p.implantMode
+      ? `Medisave: <span class="mv">$1,950</span> per implant`
+      : `Medisave: <span class="mv">${fmt(p.medisave)}</span> ${p.unit}`
+        + ((parseFloat(surgState[p.code].cashTopup)||0) > 0
+          ? ` &nbsp;·&nbsp; <span class="cv">Cash top-up: ${fmt(parseFloat(surgState[p.code].cashTopup))}/unit</span>`
+          : ``)
+
+    let apptHtml = ""
+    if(s.on && p.implantMode && !p.implantOnly){
+      const info = s.apptMode==="same"
+        ? s.qty===1
+          ? `Single implant: Medisave covers full $1,120 + $830 misc = <strong>$1,950</strong>.`
+          : `${s.qty} implants in one session: Medisave = $1,120 × ${s.qty} + $830 misc once = <strong>${fmt(l.mv)}</strong>. Extra misc ($830 × ${s.qty-1} = <strong>${fmt(l.extraMisc)}</strong>) added to cash.`
+        : `${s.qty} implant${s.qty>1?"s":""} across separate appointments: Medisave = $1,950 × ${s.qty} = <strong>${fmt(l.mv)}</strong>. No extra misc cash.`
+      apptHtml = `
+        <div class="sep" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:12px;color:var(--text-sec);font-weight:500;flex-shrink:0">Appointment</span>
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+            <input type="radio" name="appt-${p.code}" ${s.apptMode==="same"?"checked":""} onchange="surgState['${p.code}'].apptMode='same';render()"> Same appointment
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+            <input type="radio" name="appt-${p.code}" ${s.apptMode==="diff"?"checked":""} onchange="surgState['${p.code}'].apptMode='diff';render()"> Different appointments
+          </label>
+        </div>
+        <div class="info-box">${info}</div>`
+    } else if(s.on && p.implantOnly){
+      const costPer = parseFloat(s.cashTopup)||0
+      let info = ""
+      if(costPer === 0){
+        info = s.qty===1
+          ? `Single implant: Medisave = $1,120 + $830 misc = <strong>$1,950</strong>. Enter cost/implant below to calculate cash payable.`
+          : `${s.qty} implants: Medisave = $1,120 × ${s.qty} + $830 misc once = <strong>${fmt(l.mv)}</strong>. Enter cost/implant to calculate cash payable.`
+      } else {
+        const totalFee = costPer * s.qty
+        info = s.qty===1
+          ? `Cost: ${fmt(costPer)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}`
+          : `Cost: ${fmt(costPer)} × ${s.qty} = ${fmt(totalFee)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}`
+      }
+      apptHtml = `<div class="info-box" style="margin-top:8px">${info}</div>`
+    }
+
+    let crownHtml = ""
+    if(s.on && p.implantMode && !p.implantOnly){
+      crownHtml = `
+        <div class="sep" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:12px;color:var(--text-sec);font-weight:500">Crown type</span>
+          ${p.crowns.map((c,i)=>`
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+              <input type="radio" name="crown-${p.code}" ${s.crown===i?"checked":""} onchange="surgState['${p.code}'].crown=${i};render()">
+              ${c.label} ${c.cash===0
+                ?`<span class="sv" style="font-size:10px">— no cash</span>`
+                :`<span class="cv" style="font-size:10px">+${fmt(c.cash)}/implant</span>`}
+            </label>`).join("")}
+        </div>`
+    }
+
+    let lineTot = ""
+    if(s.on){
+      const gn = gst()?" (incl. GST)":""
+      lineTot = `<div class="sep line-tot">
+        <span><span style="color:var(--text-sec)">Medisave: </span><span class="mv" style="font-weight:600">${fmt(l.mv)}</span></span>
+        <span><span style="color:var(--text-sec)">Cash: </span>${l.cashTotal>0?`<span class="cv">${fmtD(l.cashTotal)}${gn}</span>`:`<span style="color:var(--text-ter)">—</span>`}</span>
+        <span><span style="color:var(--text-sec)">Line total: </span><span style="font-weight:600">${fmtD(l.total)}</span></span>
+      </div>`
+    }
+
+    div.innerHTML = `
+      <div class="row">
+        <input type="checkbox" ${s.on?"checked":""} onchange="surgState['${p.code}'].on=!surgState['${p.code}'].on;render()">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span class="badge">${p.code === "SB816M_IO" ? "SB816M" : p.code}</span>
+            <span class="pname">${p.name}</span>
+            <span class="tbadge">${p.tosp}</span>
+          </div>
+          <div class="pmeta">${meta}</div>
+        </div>
+        ${s.on?`<div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+          <span style="font-size:11px;color:var(--text-sec)">Qty</span>
+          <input type="number" min="1" max="20" value="${s.qty}" onchange="surgState['${p.code}'].qty=Math.max(1,parseInt(this.value)||1);render()">
+        </div>`:""}
+      </div>${apptHtml}${crownHtml}
+      ${s.on && p.implantMode && !p.implantOnly ? `
+      <div class="sep" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500;flex-shrink:0">Cash top-up ($)</span>
+        <input class="fee" type="number" min="0" step="0.5" value="${s.cashTopup||0}" placeholder="0" style="width:90px" onchange="surgState['${p.code}'].cashTopup=this.value;render()">
+        <span style="font-size:11px;color:var(--text-ter)">per implant · enter 0 if none</span>
+      </div>` : ""}
+      ${s.on && p.feeOnly ? `
+      <div class="sep" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500;flex-shrink:0">Fee ($)</span>
+        <input class="fee" type="number" min="0" step="0.5" value="${s.cashTopup||0}" placeholder="0" style="width:90px" onchange="surgState['${p.code}'].cashTopup=this.value;render()">
+        <span style="font-size:11px;color:var(--text-ter)">per unit</span>
+      </div>` : ""}
+      ${s.on && p.implantOnly ? `
+      <div class="sep" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500;flex-shrink:0">Cost / implant ($)</span>
+        <input class="fee" type="number" min="0" step="0.5" value="${s.cashTopup||""}" placeholder="optional" style="width:110px" onchange="surgState['${p.code}'].cashTopup=this.value;render()">
+        <span style="font-size:11px;color:var(--text-ter)">cash = (cost × qty) − Medisave</span>
+      </div>` : ""}
+      ${s.on && !p.implantMode && !p.feeOnly ? `
+      <div class="sep" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500;flex-shrink:0">Cash top-up ($)</span>
+        <input class="fee" type="number" min="0" step="0.5" value="${s.cashTopup||0}" placeholder="0" style="width:90px" onchange="surgState['${p.code}'].cashTopup=this.value;render()">
+        <span style="font-size:11px;color:var(--text-ter)">per unit · enter 0 if none</span>
+      </div>` : ""}
+      ${lineTot}`
+    list.appendChild(div)
+  })
+}
+
+// ── RENDER NON-SURGICAL ───────────────────────────────────────────────────────
+
+function renderNonSurg(){
+  const list = document.getElementById("nonsurg-list") || document.querySelector("#nonsurg-collapsible #nonsurg-list")
+  list.innerHTML = ""
+  NS.forEach(p => {
+    const s = nsState[p.id], l = getNsLine(p)
+    const subAmt = getChasSubsidy(p)
+    const div = document.createElement("div")
+    div.className = "card"+(s.on?" active":"")
+
+    const subDisplay = chasMode==="none"
+      ? `<span style="color:var(--text-ter)">Select CHAS tier above to see subsidy</span>`
+      : `<span class="sv">CHAS subsidy: ${fmt(subAmt)}/unit</span>`
+
+    let lineTot = ""
+    if(s.on){
+      const gn = gst()?" (incl. GST)":""
+      const subsStr = l.subsidyTotal>0 ? `<span class="sv">${fmtD(l.subsidyTotal)}</span>` : `<span style="color:var(--text-ter)">—</span>`
+      const cashStr = l.cashTotal>0 ? `<span class="cv">${fmtD(l.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
+      lineTot = `<div class="sep line-tot">
+        <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(l.totalFee)}</span></span>
+        <span><span style="color:var(--text-sec)">CHAS subsidy: </span>${subsStr}</span>
+        <span><span style="color:var(--text-sec)">Cash: </span>${cashStr}</span>
+        <span><span style="color:var(--text-sec)">Line total: </span><span style="font-weight:600">${fmtD(l.total)}</span></span>
+      </div>`
+    }
+
+    // Material tickboxes for denture items
+    let materialHtml = ""
+    if(s.on && p.hasMaterials){
+      materialHtml = `
+        <div class="sep" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:12px;color:var(--text-sec);font-weight:500">Material</span>
+          ${DENTURE_MATERIALS.map(m=>`
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+              <input type="checkbox" ${s.materials.includes(m)?"checked":""} onchange="toggleMaterial('${p.id}','${m}')">
+              ${m}
+            </label>`).join("")}
+        </div>`
+    }
+
+    div.innerHTML = `
+      <div class="row">
+        <input type="checkbox" ${s.on?"checked":""} onchange="nsState['${p.id}'].on=!nsState['${p.id}'].on;render()">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span class="pname">${p.name}</span>
+            <span class="tbadge">${p.unit}</span>
+          </div>
+          <div class="pmeta">${subDisplay}</div>
+          <div class="climit">${p.claimNote}</div>
+        </div>
+        ${s.on?`
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Fee ($)</span>
+            <input class="fee" type="number" min="0" step="0.5" value="${s.fee}" placeholder="0" onchange="nsState['${p.id}'].fee=this.value;render()">
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Qty</span>
+            <input type="number" min="1" max="30" value="${s.qty}" onchange="nsState['${p.id}'].qty=Math.max(1,parseInt(this.value)||1);render()">
+          </div>
+          <div style="display:flex;align-items:center;gap:4px" title="Remaining CHAS claims available for this procedure this year">
+            <span style="font-size:11px;color:var(--text-sec)">Remaining claims</span>
+            <input class="rem-input" type="number" min="0" max="99" value="${s.remaining}" onchange="nsState['${p.id}'].remaining=this.value;render()">
+          </div>
+        </div>`:""}
+      </div>${materialHtml}${lineTot}`
+    list.appendChild(div)
+  })
+}
+
+// ── UPDATE SUMMARIES ─────────────────────────────────────────────────────────
+
+function updateSurgSummary(){
+  const active = SURG.filter(p=>surgState[p.code].on)
+  if(!active.length){ return null }
+  let gMv=0, gCash=0, gTotal=0, gGstOnMv=0, gInstEligible=0
+  active.forEach(p=>{
+    const l=getSurgLine(p)
+    gMv+=l.mv; gCash+=l.cashTotal; gTotal+=l.total; gGstOnMv+=(l.gstOnMv||0); gInstEligible+=(l.instEligible||0)
+  })
+  return {mv:gMv, cash:gCash, total:gTotal, gstOnMv:gGstOnMv, instEligible:gInstEligible}
+}
+
+function updateNsSummary(){
+  const active = NS.filter(p=>nsState[p.id].on)
+  if(!active.length){ return null }
+  let gFee=0, gSub=0, gCash=0, gTotal=0
+  active.forEach(p=>{
+    const l=getNsLine(p)
+    gFee+=l.totalFee; gSub+=l.subsidyTotal; gCash+=l.cashTotal; gTotal+=l.total
+  })
+  return {fee:gFee, sub:gSub, cash:gCash, total:gTotal}
+}
+
+function updateGrand(surg, ns, ortho, pro){
+  const sec     = document.getElementById("combined-summary")
+  const btnExcel = document.getElementById("btn-excel")
+  const btnPrint = document.getElementById("btn-print")
+  const any = !!surg || !!ns || !!ortho || !!pro
+  btnExcel.disabled = !any; btnPrint.disabled = !any
+  if(!any){ sec.style.display="none"; return }
+  sec.style.display="block"
+
+  const tbody = document.getElementById("combined-tbody")
+  tbody.innerHTML = ""
+  const hasGst = gst()
+  const gn = hasGst ? "*" : ""
+
+  const sectionStyles = {
+    "Surgical Procedures":    "background:var(--bg-info);color:var(--text-info)",
+    "Non-Surgical Procedures":"background:var(--bg-success);color:var(--text-success)",
+    "Orthodontics":           "background:#fde8f5;color:#9c27b0",
+    "Additional Prosthesis":  "background:var(--bg-purple);color:var(--text-purple)",
+  }
+
+  const addSection = (label, rows) => {
+    if(!rows.length) return
+    const style = sectionStyles[label] || "background:var(--bg-surface);color:var(--text-sec)"
+    const hdr = document.createElement("tr")
+    hdr.innerHTML = `<td colspan="6" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;${style};padding:6px 10px">${label}</td>`
+    tbody.appendChild(hdr)
+    rows.forEach(r => tbody.appendChild(r))
+  }
+
+  // ── Surgical rows ──
+  const surgRows = []
+  SURG.filter(p=>surgState[p.code].on).forEach(p=>{
+    const s=surgState[p.code], l=getSurgLine(p)
+    let label = p.name
+    if(p.implantMode && !p.implantOnly) label += ` — ${p.crowns[s.crown].label}`
+    if(p.implantMode && !p.implantOnly && s.apptMode==="diff") label += " (diff. appts)"
+    const cashStr = l.cashTotal>0 ? `<span class="cv">${fmtD(l.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
+    const mvStr = p.feeOnly ? `<span style="color:var(--text-ter)">—</span>` : `<span class="mv" style="font-weight:500">${fmt(l.mv)}</span>`
+    const feeTd = p.feeOnly ? fmtD(l.cashTotal) : fmtD(l.total)
+    const tr = document.createElement("tr")
+    tr.innerHTML = `
+      <td><div style="font-weight:500">${label}</div><div style="font-size:10px;color:var(--text-ter)">${p.tosp} · ${p.unit}</div></td>
+      <td>${l.qty}</td>
+      <td>${feeTd}</td>
+      <td>${mvStr}</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td>${cashStr}</td>`
+    surgRows.push(tr)
+  })
+  addSection("Surgical Procedures", surgRows)
+
+  // ── Non-surgical rows ──
+  const nsRows = []
+  NS.filter(p=>nsState[p.id].on).forEach(p=>{
+    const s=nsState[p.id], l=getNsLine(p)
+    const mats = p.hasMaterials && s.materials.length ? ` · ${s.materials.join("/")}` : ""
+    const subStr = l.subsidyTotal>0 ? `<span class="sv">${fmtD(l.subsidyTotal)}</span>` : `<span style="color:var(--text-ter)">—</span>`
+    const cashStr = l.cashTotal>0 ? `<span class="cv">${fmtD(l.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
+    const tr = document.createElement("tr")
+    tr.innerHTML = `
+      <td><div style="font-weight:500">${p.name}${mats}</div><div style="font-size:10px;color:var(--text-ter)">${p.unit}${l.subsidisedQty<l.qty?` · ${l.subsidisedQty}/${l.qty} subsidised`:""}</div></td>
+      <td>${l.qty}</td>
+      <td>${fmtD(l.totalFee)}</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td>${subStr}</td>
+      <td>${cashStr}</td>`
+    nsRows.push(tr)
+  })
+  addSection("Non-Surgical Procedures", nsRows)
+
+  // ── Orthodontics rows ──
+  const orthoRows = []
+  ORTHO.forEach(p=>{
+    const s=orthoState[p.id], fee=parseFloat(s.fee)||0
+    if(!fee) return
+    const total=fee*s.qty, cash=total*(hasGst?1.09:1.0)
+    const remark = s.remark ? `<div style="font-size:10px;color:var(--text-ter);font-style:italic">${s.remark}</div>` : ""
+    const tr = document.createElement("tr")
+    tr.innerHTML = `
+      <td><div style="font-weight:500">${p.name}</div>${remark}</td>
+      <td>${s.qty}</td>
+      <td>${fmtD(total)}</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td><span class="cv">${fmtD(cash)}${gn}</span></td>`
+    orthoRows.push(tr)
+  })
+  addSection("Orthodontics", orthoRows)
+
+  // ── Prostho rows ──
+  const proRows = []
+  const gMult = hasGst ? 1.09 : 1.0
+  PROSTHO.forEach(p=>{
+    const s=prosthoState[p.id], fee=parseFloat(s.fee)||0
+    if(!fee) return
+    const total=fee*s.qty, cash=total*gMult
+    const mats = s.materials.length ? ` · ${s.materials.join("/")}` : ""
+    const remark = s.remark ? `<div style="font-size:10px;color:var(--text-ter);font-style:italic">${s.remark}</div>` : ""
+    const tr = document.createElement("tr")
+    tr.innerHTML = `
+      <td><div style="font-weight:500">${p.name}${mats}</div>${remark}</td>
+      <td>${s.qty}</td>
+      <td>${fmtD(total)}</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td style="color:var(--text-ter)">—</td>
+      <td><span class="cv">${fmtD(cash)}${gn}</span></td>`
+    proRows.push(tr)
+  })
+  addSection("Additional Prosthesis", proRows)
+
+  // ── Subtotal footer rows removed — grand total only ──
+
+  // ── Grand totals ──
+  const gMv    = surg ? surg.mv    : 0
+  const gChas  = ns   ? ns.sub     : 0
+  const gCash  = (surg?surg.cash:0) + (ns?ns.cash:0) + (ortho?ortho.cash:0) + (pro?pro.cash:0)
+  const gTotal = (surg?surg.total:0) + (ns?ns.total:0) + (ortho?ortho.total:0) + (pro?pro.total:0)
+
+  // GST on Medisave — must be paid upfront, NOT instalment-eligible
+  const upfrontGstOnMv = surg && hasGst ? surg.gstOnMv : 0
+  // Instalment-eligible = cash top-up (+ its GST) + all NS cash + all prostho cash
+  // For surg: instEligible is returned from updateSurgSummary
+  const surgInstEligible  = surg  ? surg.instEligible : 0
+  const nsInstEligible    = ns    ? ns.cash            : 0
+  const orthoInstEligible = ortho ? ortho.cash         : 0
+  const proInstEligible   = pro   ? pro.cash           : 0
+  const totalInstEligible = surgInstEligible + nsInstEligible + orthoInstEligible + proInstEligible
+
+  document.getElementById("cs-fee-total").textContent  = fmtD(gTotal)
+  document.getElementById("cs-mv-total").textContent   = gMv   > 0 ? fmt(gMv)    : "—"
+  document.getElementById("cs-chas-total").textContent = gChas > 0 ? fmtD(gChas) : "—"
+  document.getElementById("cs-cash-total").innerHTML   = `${fmtD(gCash)}${hasGst?" <span style='font-size:10px'>(incl. GST)</span>":""}`
+
+  document.getElementById("gm-total").textContent    = fmtD(gTotal)
+  document.getElementById("gm-cash").textContent     = fmtD(gCash)
+  document.getElementById("gm-mv").textContent       = fmt(gMv)
+  document.getElementById("gm-chas").textContent     = fmtD(gChas)
+  document.getElementById("gm-total-sub").textContent = hasGst ? "incl. GST" : "before GST"
+  document.getElementById("gm-cash-sub").textContent  = hasGst ? "incl. 9% GST" : "after Medisave + CHAS"
+
+  // GST on Medisave note
+  const gstNote = document.getElementById("gst-mv-note")
+  if(hasGst && gMv > 0){
+    gstNote.style.display = "block"
+    const cashTopupGst = totalInstEligible - (totalInstEligible / 1.09)  // approximation for display
+    document.getElementById("gn-mv-amt").textContent   = fmt(gMv)
+    document.getElementById("gn-mv-gst").textContent   = fmtD(upfrontGstOnMv)
+    document.getElementById("gn-cash-gst").textContent = fmtD(Math.max(0, gCash - upfrontGstOnMv - (gCash - upfrontGstOnMv)/1.09))
+    document.getElementById("gn-cash-total").textContent = fmtD(gCash)
+  } else {
+    gstNote.style.display = "none"
+  }
+
+  // Store for instalment calc
+  window._instEligible    = totalInstEligible
+  window._upfrontGstOnMv  = upfrontGstOnMv
+  updateInstalmentPanel()
+}
+
+function updateInstalmentPanel(){
+  const tog = document.getElementById("instalment-toggle")
+  const panel = document.getElementById("instalment-panel")
+  if(!tog || !panel) return
+  if(!tog.checked){ panel.style.display="none"; return }
+  panel.style.display="block"
+  const months = parseInt(document.querySelector('input[name="inst-months"]:checked')?.value || 6)
+  const eligible  = window._instEligible   || 0
+  const upfront   = window._upfrontGstOnMv || 0
+  const monthly   = eligible / months
+  document.getElementById("inst-total").textContent   = fmtD(eligible)
+  document.getElementById("inst-monthly").textContent = fmtD(monthly)
+  document.getElementById("inst-label").textContent   = `per month for ${months} months`
+  // Show/hide upfront note
+  const note = document.getElementById("inst-upfront-note")
+  if(note){
+    if(upfront > 0){
+      note.style.display = "block"
+      document.getElementById("inst-upfront-amt").textContent = fmtD(upfront)
+    } else {
+      note.style.display = "none"
+    }
+  }
+}
+
+// ── MATERIAL TOGGLE ──────────────────────────────────────────────────────────
+
+function toggleMaterial(id, mat){
+  const mats = nsState[id].materials
+  const idx = mats.indexOf(mat)
+  if(idx === -1) mats.push(mat)
+  else mats.splice(idx, 1)
+  render()
+}
+
+function toggleProsthoMaterial(id, mat){
+  const mats = prosthoState[id].materials
+  const idx = mats.indexOf(mat)
+  if(idx === -1) mats.push(mat)
+  else mats.splice(idx, 1)
+  render()
+}
+
+// ── RENDER ORTHODONTICS ──────────────────────────────────────────────────────
+
+function renderOrtho(){
+  const list = document.getElementById("ortho-list")
+  if(!list) return
+  list.innerHTML = ""
+  ORTHO.forEach(p => {
+    const s = orthoState[p.id]
+    const fee = parseFloat(s.fee)||0
+    const total = fee * s.qty
+    const gn = gst() ? " (incl. GST)" : ""
+    const totalWithGst = total * (gst() ? 1.09 : 1.0)
+    const div = document.createElement("div")
+    div.className = "card active"
+    div.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span class="pname">${p.name}</span>
+            <span class="tbadge">${p.unit}</span>
+          </div>
+          <div class="pmeta" style="margin-top:4px">No CHAS subsidy · No Medisave · Cash only</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Fee ($)</span>
+            <input class="fee" type="number" min="0" step="0.5" value="${s.fee}" placeholder="0" onchange="orthoState['${p.id}'].fee=this.value;render()">
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Qty</span>
+            <input type="number" min="1" max="30" value="${s.qty}" onchange="orthoState['${p.id}'].qty=Math.max(1,parseInt(this.value)||1);render()">
+          </div>
+        </div>
+      </div>
+      <div class="sep">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
+          <input type="text" value="${s.remark}" placeholder="e.g. upper + lower arches, 18 aligners…" style="flex:1;font-size:12px" oninput="orthoState['${p.id}'].remark=this.value" onblur="render()">
+        </div>
+      </div>
+      ${fee > 0 ? `<div class="sep line-tot">
+        <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
+        <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
+      </div>` : ""}`
+    list.appendChild(div)
+  })
+}
+
+function updateOrthoSummary(){
+  const g = gst() ? 1.09 : 1.0
+  let gFee = 0, gCash = 0, hasContent = false
+  ORTHO.forEach(p => {
+    const s = orthoState[p.id]
+    const fee = parseFloat(s.fee)||0
+    if(!fee) return
+    hasContent = true
+    const total = fee * s.qty
+    const cash = total * g
+    gFee += total; gCash += cash
+  })
+  if(!hasContent) return null
+  return { fee: gFee, cash: gCash, total: gCash }
+}
+
+// ── RENDER PROSTHODONTICS ─────────────────────────────────────────────────────
+
+function renderProstho(){
+  const list = document.getElementById("prostho-list")
+  if(!list) return
+  list.innerHTML = ""
+  PROSTHO.forEach(p => {
+    const s = prosthoState[p.id]
+    const fee = parseFloat(s.fee)||0
+    const total = fee * s.qty
+    const gn = gst() ? " (incl. GST)" : ""
+    const totalWithGst = total * (gst() ? 1.09 : 1.0)
+    const div = document.createElement("div")
+    div.className = "card active"
+    div.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span class="pname">${p.name}</span>
+            <span class="tbadge">${p.unit}</span>
+          </div>
+          <div class="pmeta" style="margin-top:4px">No CHAS subsidy · No Medisave · Cash only</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Fee ($)</span>
+            <input class="fee" type="number" min="0" step="0.5" value="${s.fee}" placeholder="0" onchange="prosthoState['${p.id}'].fee=this.value;render()">
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-size:11px;color:var(--text-sec)">Qty</span>
+            <input type="number" min="1" max="30" value="${s.qty}" onchange="prosthoState['${p.id}'].qty=Math.max(1,parseInt(this.value)||1);render()">
+          </div>
+        </div>
+      </div>
+      <div class="sep" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-sec);font-weight:500">Material</span>
+        ${p.materials.map(m=>`
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+            <input type="checkbox" ${s.materials.includes(m)?"checked":""} onchange="toggleProsthoMaterial('${p.id}','${m}')">
+            ${m}
+          </label>`).join("")}
+      </div>
+      <div class="sep">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
+          <input type="text" value="${s.remark}" placeholder="Enter remark (e.g. upper full denture, shade A2)…" style="flex:1;font-size:12px" oninput="prosthoState['${p.id}'].remark=this.value" onblur="render()">
+        </div>
+      </div>
+      ${fee > 0 ? `<div class="sep line-tot">
+        <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
+        <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
+      </div>` : ""}`
+    list.appendChild(div)
+  })
+}
+
+function updateProsthoSummary(){
+  const g = gst() ? 1.09 : 1.0
+  let gFee = 0, gCash = 0, hasContent = false
+  PROSTHO.forEach(p => {
+    const s = prosthoState[p.id]
+    const fee = parseFloat(s.fee)||0
+    if(!fee) return
+    hasContent = true
+    const total = fee * s.qty
+    const cash = total * g
+    gFee += total; gCash += cash
+  })
+  if(!hasContent) return null
+  return { fee: gFee, cash: gCash, total: gCash }
+}
+
+// ── MAIN RENDER ──────────────────────────────────────────────────────────────
+
+function render(){
+  renderSurg()
+  renderNonSurg()
+  renderOrtho()
+  renderProstho()
+  const surg  = updateSurgSummary()
+  const ns    = updateNsSummary()
+  const ortho = updateOrthoSummary()
+  const pro   = updateProsthoSummary()
+  updateGrand(surg, ns, ortho, pro)
+}
+
+// ── PRINT ────────────────────────────────────────────────────────────────────
+
+function printQuote(){ window.print() }
+
+// ── EXCEL EXPORT ─────────────────────────────────────────────────────────────
+
+function exportExcel(){
+  if(!window.XLSX){ alert("XLSX library not loaded, try again in a moment."); return }
+  const patient = document.getElementById("patient-name").value || "(Not specified)"
+  const doctor  = document.getElementById("doctor-name").value || ""
+  const today   = getToday()
+  const g       = gst()
+  const chasLabel= {none:"None",orange:"CHAS Orange",blue:"CHAS Blue",mg:"Merdeka Generation",pg:"Pioneer Generation"}[chasMode]
+
+  const rows = [
+    ["DENTAL TREATMENT QUOTATION"],
+    [],
+    ["Patient Name:", patient],
+    ["Doctor:", doctor],
+    ["Date:", today],
+    ["CHAS Tier:", chasLabel],
+    ["GST:", g ? "9% applied to cash component only" : "Not applied"],
+    ["Note:", "Medisave amounts are maximum claimable, subject to CPF/MOH approval."],
+    [],
+    ["━━ SURGICAL PROCEDURES (Medisave-claimable) ━━"],
+    ["Code","Procedure","Crown Type","Appointment","TOSP","Qty","Unit","Medisave/Unit","Cash/Unit (before GST)","Extra Misc","Total Medisave","Total Cash"+(g?" (w/ GST)":""),"Line Total"],
+  ]
+  let sMv=0,sCash=0,sTotal=0
+  SURG.filter(p=>surgState[p.code].on).forEach(p=>{
+    const s=surgState[p.code], l=getSurgLine(p)
+    sMv+=l.mv; sCash+=l.cashTotal; sTotal+=l.total
+    let crownLbl="N/A", apptLbl=s.apptMode==="same"?"Same appointment":"Different appointments"
+    let mvPer=0, cashPer=0
+    if(p.implantOnly){
+      crownLbl="N/A (implant only)"
+      mvPer=s.apptMode==="same"&&s.qty===1?p.surgical+p.misc:p.surgical
+      cashPer=0
+    } else if(p.implantMode){
+      crownLbl=p.crowns[s.crown].label
+      mvPer=s.apptMode==="same"&&s.qty===1?p.surgical+p.misc:p.surgical
+      cashPer=p.crowns[s.crown].cash+(s.apptMode==="same"&&s.qty>1?p.misc:0)
+    } else { mvPer=p.medisave; cashPer=p.cash||0; apptLbl="N/A" }
+    const displayCode = p.code==="SB816M_IO"?"SB816M":p.code
+    rows.push([displayCode,p.name,crownLbl,apptLbl,p.tosp,l.qty,p.unit,mvPer,cashPer,l.extraMisc||"",l.mv,l.cashTotal,l.total])
+  })
+  rows.push(["","","","","","","Surgical totals","","","",sMv,sCash,sTotal])
+  rows.push([])
+  rows.push(["━━ NON-SURGICAL PROCEDURES (CHAS-subsidised) ━━"])
+  rows.push(["Procedure","Material(s)","Unit","CHAS Tier","Fee/Unit","CHAS Subsidy/Unit","Qty","Remaining Claims","Subsidised Qty","Total Fee","Total CHAS Subsidy","Cash"+(g?" (w/ GST)":""),"Line Total"])
+  let nFee=0,nSub=0,nCash=0,nTotal=0
+  NS.filter(p=>nsState[p.id].on).forEach(p=>{
+    const s=nsState[p.id], l=getNsLine(p)
+    nFee+=l.totalFee; nSub+=l.subsidyTotal; nCash+=l.cashTotal; nTotal+=l.total
+    const mats = p.hasMaterials && s.materials.length ? s.materials.join(", ") : ""
+    rows.push([p.name,mats,p.unit,chasLabel,parseFloat(s.fee)||0,l.effectiveSub,l.qty,s.remaining,l.subsidisedQty,l.totalFee,l.subsidyTotal,l.cashTotal,l.total])
+  })
+  rows.push(["","","","","","","Non-surgical totals","","",nFee,nSub,nCash,nTotal])
+  rows.push([])
+  rows.push(["━━ ORTHODONTICS ━━"])
+  rows.push(["Item","Unit","Fee/Unit","Qty","Total Fee","Cash"+(g?" (w/ GST)":""),"Remarks"])
+  let oFee=0,oCash=0
+  const oMult=g?1.09:1
+  ORTHO.forEach(p=>{
+    const s=orthoState[p.id], fee=parseFloat(s.fee)||0
+    if(!fee) return
+    const tot=fee*s.qty, cash=tot*oMult
+    oFee+=tot; oCash+=cash
+    rows.push([p.name,p.unit,fee,s.qty,tot,cash,s.remark||""])
+  })
+  rows.push(["","","","Orthodontics totals",oFee,oCash,""])
+  rows.push([])
+  rows.push(["━━ ADDITIONAL PROSTHESIS ━━"])
+  rows.push(["Item","Material(s)","Unit","Fee/Unit","Qty","Total Fee","Cash"+(g?" (w/ GST)":""),"Remarks"])
+  let pFee=0,pCash=0
+  const gMult=g?1.09:1
+  PROSTHO.forEach(p=>{
+    const s=prosthoState[p.id], fee=parseFloat(s.fee)||0
+    if(!fee) return
+    const tot=fee*s.qty, cash=tot*gMult
+    pFee+=tot; pCash+=cash
+    const mats = s.materials.length ? s.materials.join(", ") : ""
+    rows.push([p.name,mats,p.unit,fee,s.qty,tot,cash,s.remark||""])
+  })
+  rows.push(["","","","","Additional Prosthesis totals",pFee,pCash,""])
+  rows.push([])
+  rows.push(["GRAND TOTAL"])
+  rows.push(["Medisave",fmt(sMv),"CHAS",fmtD(nSub),"Cash",fmtD(sCash+nCash+oCash+pCash)+(g?" (incl. GST)":""),"Total",fmtD(sTotal+nTotal+oCash+pCash)])
+  if(g) rows.push(["* Cash columns include 9% GST. Medisave and CHAS subsidy columns are GST-exclusive."])
+
+  const ws = XLSX.utils.aoa_to_sheet(rows)
+  ws["!cols"]=[{wch:44},{wch:14},{wch:20},{wch:22},{wch:11},{wch:6},{wch:18},{wch:14},{wch:20},{wch:14},{wch:18},{wch:22},{wch:14}]
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "Quotation")
+  const safe=(patient==="(Not specified)"?"Patient":patient).replace(/\s+/g,"_")
+  XLSX.writeFile(wb, `Dental_Quote_${safe}_${new Date().toISOString().slice(0,10)}.xlsx`)
+}
+
+
+// ── SIGNATURE VIA QR (Firebase Realtime Database relay) ──────────────────────
+//
+// SETUP — one-time, takes ~5 minutes:
+//  1. Go to console.firebase.google.com → Add project (any name)
+//  2. Left sidebar: Build → Realtime Database → Create Database → Start in test mode
+//  3. Copy your database URL (looks like https://your-app-default-rtdb.firebaseio.com)
+//  4. Paste it below, replacing the placeholder:
+
+const FIREBASE_DB = 'https://dental-quotation-default-rtdb.asia-southeast1.firebasedatabase.app'
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function _fbUrl(sessionId){ return `${FIREBASE_DB}/sigs/${sessionId}.json` }
+
+function _randId(){
+  return Math.random().toString(36).slice(2,10) + Date.now().toString(36)
+}
+
+const _urlParams   = new URLSearchParams(window.location.search)
+const _signSession = _urlParams.get('sign')
+
+if(_signSession){
+  // ── PATIENT SIGNING PAGE ──────────────────────────────────────────────────
+  document.querySelector('.wrap').style.display = 'none'
+  const sp = document.getElementById('signing-page')
+  sp.style.display = 'flex'
+  const canvas = document.getElementById('sig-canvas')
+
+  setTimeout(() => {
+    canvas.width  = canvas.offsetWidth
+    canvas.height = 200
+  }, 60)
+
+  const ctx = () => canvas.getContext('2d')
+  let drawing = false, lx = 0, ly = 0
+
+  function _pos(e){
+    const r = canvas.getBoundingClientRect()
+    const s = e.touches ? e.touches[0] : e
+    return { x:(s.clientX-r.left)*(canvas.width/r.width), y:(s.clientY-r.top)*(canvas.height/r.height) }
+  }
+  function _start(e){ drawing=true; const p=_pos(e); lx=p.x; ly=p.y }
+  function _draw(e){
+    if(!drawing) return; e.preventDefault()
+    const p=_pos(e), c=ctx()
+    c.beginPath(); c.moveTo(lx,ly); c.lineTo(p.x,p.y)
+    c.strokeStyle='#1a1a18'; c.lineWidth=2.5; c.lineCap='round'; c.lineJoin='round'; c.stroke()
+    lx=p.x; ly=p.y
+  }
+  function _end(){ drawing=false }
+
+  canvas.addEventListener('mousedown',  _start)
+  canvas.addEventListener('mousemove',  _draw)
+  canvas.addEventListener('mouseup',    _end)
+  canvas.addEventListener('mouseleave', _end)
+  canvas.addEventListener('touchstart', e=>{e.preventDefault();_start(e)}, {passive:false})
+  canvas.addEventListener('touchmove',  _draw, {passive:false})
+  canvas.addEventListener('touchend',   _end)
+
+  document.getElementById('sig-clear-btn').onclick = () =>
+    ctx().clearRect(0, 0, canvas.width, canvas.height)
+
+  document.getElementById('sig-submit-btn').onclick = async () => {
+    const btn = document.getElementById('sig-submit-btn')
+    const msg = document.getElementById('sig-msg')
+    btn.disabled = true; btn.textContent = 'Submitting…'
+    try {
+      const dataUrl = canvas.toDataURL('image/png')
+      const resp = await fetch(_fbUrl(_signSession), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'signed', signature: dataUrl })
+      })
+      if(!resp.ok) throw new Error('Firebase write failed: ' + resp.status)
+      document.getElementById('signing-page').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+                    height:100%;text-align:center;padding:2rem;font-family:system-ui">
+          <div style="font-size:56px;margin-bottom:1rem">✓</div>
+          <h2 style="font-size:20px;font-weight:600;color:#1479b8;margin:0 0 8px">Signature submitted!</h2>
+          <p style="font-size:14px;color:#666">You may now close this page.</p>
+        </div>`
+    } catch(err){
+      msg.textContent = 'Failed to submit — ' + err.message
+      btn.disabled = false; btn.textContent = 'Submit Signature'
+    }
+  }
+}
+
+// ── DESKTOP: generate QR and poll ────────────────────────────────────────────
+
+async function generateSigningQR(){
+  if(FIREBASE_DB.includes('YOUR_PROJECT_ID')){
+    alert('Firebase is not configured yet.\n\nPlease follow the setup instructions in the code (search for FIREBASE_DB) and replace YOUR_PROJECT_ID with your actual Firebase project ID.')
+    return
+  }
+
+  const btn = document.getElementById('get-sig-btn')
+  btn.textContent = 'Creating…'; btn.disabled = true
+
+  const sessionId = _randId()
+  try {
+    const resp = await fetch(_fbUrl(sessionId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'waiting', signature: null })
+    })
+    if(!resp.ok) throw new Error('HTTP ' + resp.status)
+  } catch(err){
+    alert('Could not create signing session.\n\nError: ' + err.message + '\n\nMake sure your Firebase Realtime Database URL is correct and the database is in test mode (open read/write).')
+    btn.textContent = 'Get signature'; btn.disabled = false
+    return
+  }
+
+  btn.textContent = 'Get signature'; btn.disabled = false
+
+  const sigUrl = window.location.origin + window.location.pathname + '?sign=' + sessionId
+  const modal  = document.getElementById('qr-modal')
+  modal.style.display = 'flex'
+
+  const qrDiv = document.getElementById('qr-code')
+  qrDiv.innerHTML = ''
+  if(window.QRCode){
+    new QRCode(qrDiv, { text:sigUrl, width:200, height:200, colorDark:'#1a1a18', colorLight:'#ffffff' })
+  } else {
+    qrDiv.innerHTML = `<p style="font-size:10px;color:#666;word-break:break-all;max-width:200px">${sigUrl}</p>`
+  }
+  document.getElementById('qr-status').textContent = 'Waiting for patient to sign…'
+
+  window._sigPoll = setInterval(async () => {
+    try {
+      const r = await fetch(_fbUrl(sessionId))
+      if(!r.ok) return
+      const data = await r.json()
+      if(data && data.status === 'signed' && data.signature){
+        clearInterval(window._sigPoll); window._sigPoll = null
+        document.getElementById('qr-status').textContent = '✓ Signature received!'
+        setTimeout(() => { placeSignature(data.signature); closeQrModal() }, 700)
+      }
+    } catch(e){ /* keep polling */ }
+  }, 2000)
+}
+
+function closeQrModal(){
+  document.getElementById('qr-modal').style.display = 'none'
+  if(window._sigPoll){ clearInterval(window._sigPoll); window._sigPoll = null }
+}
+
+function placeSignature(dataUrl){
+  const area = document.getElementById('sig-image-area')
+  area.innerHTML = `<img src="${dataUrl}" style="width:100%;height:44px;object-fit:contain;object-position:left bottom">`
+  document.getElementById('sig-label').textContent = 'Signed digitally'
+  document.getElementById('get-sig-btn').style.display  = 'none'
+  document.getElementById('clear-sig-btn').style.display = 'inline-block'
+}
+
+function clearSignature(){
+  document.getElementById('sig-image-area').innerHTML = ''
+  document.getElementById('sig-label').textContent     = "Patient\'s signature"
+  document.getElementById('get-sig-btn').style.display  = 'inline-block'
+  document.getElementById('clear-sig-btn').style.display = 'none'
+}
+
+render()
+</script>
+</body>
+</html>
