@@ -350,7 +350,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 
 <div style="font-size:10px;color:var(--text-ter);line-height:1.7;border-top:0.5px solid var(--border-lt);padding-top:12px;margin-top:16px" class="no-print">
   <strong>Medisave (CPF, Apr 2025):</strong> SB816M = $1,120 surgical + $830 misc per session (misc once per appointment) · SB803M/SB813M = $1,950/unit · SB802M = $2,220/unit · SF812T = $420 surgical + $830 misc = $1,250/tooth · SF813T = $1,120 surgical + $830 misc = $1,950/tooth · Socket Preservation = not Medisave-claimable<br>
-  <strong>CHAS (MOH, Oct 2025):</strong> Subsidy applied to subsidised units = min(qty, remaining claims). Subsidy cannot exceed fee charged.<br>
+  <strong>CHAS (MOH, Oct 2025 — 18 official procedures):</strong> Subsidy applied to subsidised units = min(qty, remaining claims). Subsidy cannot exceed fee charged. Source: MOH Annex A, effective 1 Oct 2025.<br>
   <strong>GST (9%):</strong> Applied to the full fee including Medisave amount. GST on Medisave portion is added to patient's cash payable. GST on CHAS subsidy portion is not charged to patient.<br>
   Subject to CPF/MOH approval. All amounts in SGD.
 </div>
@@ -386,36 +386,35 @@ const SURG = [
 ]
 
 // CHAS subsidy per tier: [Orange, Blue, MG, PG]
+// ── Official CHAS dental subsidy list — MOH Annex A, effective 1 Oct 2025 ──
+// subs order: [Orange, Blue, MG, PG]
+// All 18 CHAS procedures exactly as listed by MOH; SRP, pit & fissure sealant,
+// separate PA/BW xray lines, and composite/amalgam subtypes are NOT in the official list.
 const NS = [
-  // ── Preventive ──
-  { id:"scale",    name:"Scaling and Polishing",                           unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[15.50,23.50,28.50,33.50] },
-  { id:"fluor",    name:"Fluoride Treatment",                              unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[5.50,8.50,11,13.50] },
-  { id:"sealant",  name:"Pit and Fissure Sealant",                         unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4 teeth/yr; permanent molars only",                      subs:[5,7.50,8.50,9.50] },
-  // ── X-rays ──
-  { id:"xray_pa",  name:"Periapical X-ray",                                unit:"per film",      maxClaims:4,  claimNote:"Up to 4 films/yr",                                             subs:[3,4.50,5,5.50] },
-  { id:"xray_bw",  name:"Bitewing X-ray",                                  unit:"per film",      maxClaims:4,  claimNote:"Up to 4 films/yr (shared with periapical)",                    subs:[3,4.50,5,5.50] },
-  { id:"xray_opg", name:"Panoramic X-ray (OPG)",                           unit:"per film",      maxClaims:1,  claimNote:"Up to 1/yr",                                                   subs:[15.50,23.50,26,28.50] },
-  // ── Fillings ──
-  { id:"fill_ca",  name:"Composite Filling — Anterior",                    unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[27.50,41,44,47] },
-  { id:"fill_cp1", name:"Composite Filling — Posterior (1 surface)",       unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[44,66,71,76] },
-  { id:"fill_cp2", name:"Composite Filling — Posterior (2+ surfaces)",     unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[60,90,96,102] },
-  { id:"fill_am1", name:"Amalgam Filling — Posterior (1 surface)",         unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[27.50,41,44,47] },
-  { id:"fill_am2", name:"Amalgam Filling — Posterior (2+ surfaces)",       unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared across all filling types",                   subs:[36,54,57.50,61] },
-  // ── Periodontal ──
-  { id:"srp",      name:"Scaling and Root Planing",                        unit:"per quadrant",  maxClaims:4,  claimNote:"Up to 4 quadrants/yr",                                         subs:[60,90,96,102] },
+  // ── Preventive / Basic (all 4 tiers from 1 Oct 2025) ──
+  { id:"consult",  name:"Consultation",                                    unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[13.50,20.50,25.50,30.50] },
+  { id:"scale",    name:"Scaling",                                         unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[20,30,35,40] },
+  { id:"polish",   name:"Polishing",                                       unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[13.50,20.50,25.50,30.50] },
+  { id:"fluor",    name:"Topical Fluoride",                                unit:"per visit",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[13.50,20.50,25.50,30.50] },
+  { id:"xray",     name:"X-Ray (PA / Bitewing / Occlusal)",                unit:"per film",      maxClaims:4,  claimNote:"Up to 4 films/yr",                                             subs:[7.50,11,16,21] },
+  { id:"xray_opg", name:"X-Ray (OPG / Panoramic)",                        unit:"per film",      maxClaims:1,  claimNote:"Up to 1/yr",                                                   subs:[7.50,11,16,21] },
   // ── Extractions ──
   { id:"ext_a",    name:"Extraction — Anterior",                           unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ posterior extractions",                   subs:[19,28.50,33.50,38.50] },
   { id:"ext_p",    name:"Extraction — Posterior",                          unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ anterior extractions",                    subs:[45.50,68.50,73.50,78.50] },
-  // ── Root Canal Treatment ──
+  // ── Fillings ──
+  { id:"fill_s",   name:"Filling — Simple",                                unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ complex fillings",                        subs:[20,30,35,40] },
+  { id:"fill_c",   name:"Filling — Complex",                               unit:"per tooth",     maxClaims:4,  claimNote:"Up to 4/yr shared w/ simple fillings",                         subs:[33.50,50,55,60] },
+  // ── Restorative ──
+  { id:"recem",    name:"Re-Cementation",                                  unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2/yr",                                                   subs:[23.50,35,40,45] },
   { id:"rct_a",    name:"Root Canal Treatment — Anterior",                 unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[217.50,326,331,336] },
   { id:"rct_pm",   name:"Root Canal Treatment — Pre-molar",                unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[308.50,462.50,467.50,472.50] },
   { id:"rct_m",    name:"Root Canal Treatment — Molar",                    unit:"per tooth",     maxClaims:2,  claimNote:"Up to 2 RCTs/yr shared across all RCT types",                  subs:[389.50,584.50,589.50,594.50] },
-  // ── Crown ──
   { id:"crown",    name:"Permanent Crown",                                 unit:"per crown",     maxClaims:4,  claimNote:"Up to 4/yr; natural teeth only, not implant-supported",         subs:[410,615,620,625] },
   // ── Dentures ──
-  { id:"pd_s",     name:"Partial Denture — Simple (< 6 teeth)",            unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[202.50,304,309,314],    hasMaterials:true },
-  { id:"pd_c",     name:"Partial Denture — Complex (≥ 6 teeth)",           unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[257,385.50,390.50,395.50], hasMaterials:true },
-  { id:"cd",       name:"Complete Denture (Upper or Lower)",                unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[272.50,408.50,413.50,418.50], hasMaterials:true },
+  { id:"pd_s",     name:"Removable Denture — Partial, Simple",             unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[202.50,304,309,314],    hasMaterials:true },
+  { id:"pd_c",     name:"Removable Denture — Partial, Complex",            unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[257,385.50,390.50,395.50], hasMaterials:true },
+  { id:"cd",       name:"Removable Denture — Complete (Upper or Lower)",   unit:"per denture",   maxClaims:1,  claimNote:"Up to 1 upper + 1 lower per 3 calendar years",                 subs:[272.50,408.50,413.50,418.50], hasMaterials:true },
+  { id:"dent_rr",  name:"Denture Reline / Repair",                        unit:"per denture",   maxClaims:1,  claimNote:"Up to 1/yr per denture",                                       subs:[50,75,80,85] },
 ]
 
 const DENTURE_MATERIALS = ["Acrylic", "Flexible", "CoCr", "Implant Overdenture"]
