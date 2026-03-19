@@ -6,20 +6,13 @@
 <title>WE Dental Clinic Quotation</title>
 <style>
 :root {
-  --bg-page:#f5f5f2;--bg-card:#fff;--bg-surface:#f0ede6;--bg-info:#e6f1fb;--bg-success:#eaf3de;--bg-purple:#eeedfe;
+  --bg-page:#f5f5f2;--bg-card:#fff;--bg-surface:#f0ede6;--bg-info:#e6f1fb;--bg-success:#eaf3de;--bg-purple:#eeedfe;--bg-ortho:#fce4f6;
   --text-pri:#1a1a18;--text-sec:#5f5e5a;--text-ter:#8a8880;
-  --text-info:#185fa5;--text-success:#2f6010;--text-cash:#b06000;--text-mv:#1479b8;--text-purple:#534ab7;
+  --text-info:#185fa5;--text-success:#2f6010;--text-cash:#b06000;--text-mv:#1479b8;--text-purple:#534ab7;--text-ortho:#8b1a7a;
   --border-lt:rgba(0,0,0,.11);--border-md:rgba(0,0,0,.24);
   --r-sm:6px;--r-md:8px;--r-lg:12px;
 }
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg-page:#1a1a18;--bg-card:#242422;--bg-surface:#2c2c2a;--bg-info:#0c2a44;--bg-success:#172d06;--bg-purple:#26215c;
-    --text-pri:#f0ede6;--text-sec:#a8a49e;--text-ter:#706d68;
-    --text-info:#78bbf0;--text-success:#7aba3a;--text-cash:#e09030;--text-mv:#5ab0f0;--text-purple:#afa9ec;
-    --border-lt:rgba(255,255,255,.09);--border-md:rgba(255,255,255,.21);
-  }
-}
+
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg-page);color:var(--text-pri);padding:1.5rem 1rem;font-size:14px;line-height:1.5;min-height:100vh}
 .wrap{max-width:860px;margin:0 auto}
@@ -69,8 +62,8 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .section-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
 .tag-surgical{background:var(--bg-info);color:var(--text-info)}
 .tag-nonsurg{background:var(--bg-success);color:var(--text-success)}
-.tag-ortho{background:#fde8f5;color:#9c27b0}
-@media(prefers-color-scheme:dark){.tag-ortho{background:#3d1a45;color:#e090d8}}
+.tag-ortho{background:var(--bg-ortho);color:var(--text-ortho)}
+}
 .chas-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);margin-bottom:12px}
 .chas-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border-md);background:var(--bg-surface);color:var(--text-sec);cursor:pointer;transition:all .12s;white-space:nowrap}
 .chas-btn.sel-none{border-color:var(--border-md);background:var(--bg-surface);color:var(--text-pri)}
@@ -78,8 +71,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .chas-btn.sel-blue{border-color:#1479b8;background:#e6f1fb;color:#185fa5}
 .chas-btn.sel-mg{border-color:#7a5c0a;background:#fef9ec;color:#6b4d08}
 .chas-btn.sel-pg{border-color:#2f6010;background:#eaf3de;color:#2f6010}
-@media(prefers-color-scheme:dark){
-  .chas-btn.sel-orange{background:#3a2200;color:#e09030}
+
   .chas-btn.sel-blue{background:#0c2a44;color:#78bbf0}
   .chas-btn.sel-mg{background:#2a1c00;color:#c9980a}
   .chas-btn.sel-pg{background:#172d06;color:#7aba3a}
@@ -223,7 +215,8 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
   <hr class="divider">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
     <span style="font-size:15px;font-weight:600;color:var(--text-pri)">Summary</span>
-    <span style="font-size:11px;color:var(--text-sec)">All selected treatments</span>
+    <span style="font-size:11px;color:var(--text-sec)">Manually added items</span>
+    <button onclick="summaryItems=[];render()" class="btn no-print" style="font-size:10px;padding:2px 9px;color:var(--text-sec)">Clear all</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0" class="no-print">
       <input type="checkbox" id="gst-toggle" onchange="render()" style="width:14px;height:14px;accent-color:#1479b8;cursor:pointer">
       <label for="gst-toggle" style="font-size:12px;cursor:pointer;font-weight:500">Add 9% GST</label>
@@ -438,6 +431,131 @@ const ORTHO = [
   { id:"clear_aligners", name:"Invisalign",  unit:"per case" },
 ]
 
+
+// ── SUMMARY ITEMS ─────────────────────────────────────────────────────────────
+// Manually added items. Each: { id, section, label, sublabel, qty,
+//   mv, chas, cashTopupBase, hasMv, deposit, feeDisplayType }
+// feeDisplayType: 'surgTotal' | 'nsGross' | 'preGross' | 'cashOnly'
+let summaryItems = []
+
+function recalcItem(item){
+  const g = gst()
+  const gstOnMv = item.hasMv && g ? item.mv * 0.09 : 0
+  const cashTopupGst = item.cashTopupBase * (g ? 1.09 : 1.0)
+  const cashTotal = cashTopupGst + gstOnMv
+  const total = item.mv + item.chas + cashTotal
+  const instEligible = Math.max(0, cashTopupGst - (item.deposit || 0))
+  let displayFee
+  if(item.feeDisplayType === 'surgTotal')    displayFee = item.mv + cashTotal
+  else if(item.feeDisplayType === 'nsGross') displayFee = item.chas + item.cashTopupBase
+  else if(item.feeDisplayType === 'preGross') displayFee = item.cashTopupBase
+  else                                        displayFee = cashTotal  // 'cashOnly'
+  return { gstOnMv, cashTopupGst, cashTotal, total, instEligible, displayFee }
+}
+
+function removeSummaryItem(id){
+  summaryItems = summaryItems.filter(i => i.id !== id)
+  render()
+}
+
+function addSurgToSummary(pCode){
+  const p = SURG.find(x => x.code === pCode)
+  if(!p) return
+  const s = surgState[pCode]
+  const l = getSurgLine(p)
+  let label = p.name
+  if(p.implantCrown){
+    const ci = s.crownItems||[]
+    const sel = p.crowns.filter((_,i) => ci[i]&&ci[i].sel).map(c=>c.label)
+    if(sel.length) label += ` — ${sel.join(' + ')}`
+  } else if(p.implantMode && !p.implantOnly){
+    label += ` — ${p.crowns[s.crown].label}`
+    if(s.apptMode==='diff') label += ' (diff. appts)'
+  }
+  const dispCode = pCode==='SB816M_IO'?'SB816M':pCode
+  summaryItems.push({
+    id: Date.now()+Math.random(),
+    section: 'Surgical Procedures',
+    label,
+    sublabel: `${dispCode} · ${p.unit}${s.remark ? ' · ' + s.remark : ''}`,
+    qty: l.qty,
+    mv: l.mv,
+    chas: 0,
+    cashTopupBase: l.cashBefore,
+    hasMv: l.mv > 0,
+    deposit: 0,
+    feeDisplayType: (p.feeOnly||p.implantCrown) ? 'cashOnly' : 'surgTotal'
+  })
+  render()
+}
+
+function addNsToSummary(pid){
+  const p = NS.find(x => x.id === pid)
+  if(!p) return
+  const s = nsState[pid]
+  const l = getNsLine(p)
+  const mats = p.hasMaterials && s.materials.length ? ` · ${s.materials.join('/')}` : ''
+  const sub = l.subsidisedQty < l.qty ? ` · ${l.subsidisedQty}/${l.qty} subsidised` : ''
+  summaryItems.push({
+    id: Date.now()+Math.random(),
+    section: 'Non-Surgical Procedures',
+    label: p.name + mats,
+    sublabel: p.unit + sub,
+    qty: l.qty,
+    mv: 0,
+    chas: l.subsidyTotal,
+    cashTopupBase: l.cashBefore,
+    hasMv: false,
+    deposit: 0,
+    feeDisplayType: 'nsGross'
+  })
+  render()
+}
+
+function addOrthoToSummary(pid){
+  const p = ORTHO.find(x => x.id === pid)
+  if(!p) return
+  const s = orthoState[pid]
+  const fee = parseFloat(s.fee)||0
+  const deposit = Math.min(parseFloat(s.deposit)||0, fee)
+  const sub = (s.remark ? ` · ${s.remark}` : '') + (deposit > 0 ? ` · deposit $${deposit.toFixed(2)}` : '')
+  summaryItems.push({
+    id: Date.now()+Math.random(),
+    section: 'Orthodontics',
+    label: p.name,
+    sublabel: p.unit + sub,
+    qty: 1,
+    mv: 0,
+    chas: 0,
+    cashTopupBase: fee,
+    hasMv: false,
+    deposit,
+    feeDisplayType: 'preGross'
+  })
+  render()
+}
+
+function addMiscToSummary(idx){
+  const line = miscLines[idx]
+  if(!line) return
+  const fee = parseFloat(line.fee)||0
+  const total = fee * line.qty
+  summaryItems.push({
+    id: Date.now()+Math.random(),
+    section: 'Miscellaneous Procedures',
+    label: line.name||'(Unnamed procedure)',
+    sublabel: 'per unit' + (line.remark ? ` · ${line.remark}` : ''),
+    qty: line.qty,
+    mv: 0,
+    chas: 0,
+    cashTopupBase: total,
+    hasMv: false,
+    deposit: 0,
+    feeDisplayType: 'preGross'
+  })
+  render()
+}
+
 const CHAS_TIERS = ["orange","blue","mg","pg"]
 const CHAS_IDX   = {none:-1,orange:0,blue:1,mg:2,pg:3}
 
@@ -445,7 +563,7 @@ const CHAS_IDX   = {none:-1,orange:0,blue:1,mg:2,pg:3}
 
 const surgState = {}
 SURG.forEach(p => {
-  surgState[p.code] = { on:false, qty:1, crown:0, apptMode:"same", cashTopup:0 }
+  surgState[p.code] = { on:false, qty:1, crown:0, apptMode:"same", cashTopup:0, remark:"" }
   if(p.implantCrown) surgState[p.code].crownItems = [{sel:false,fee:0},{sel:false,fee:0}]
 })
 
@@ -600,6 +718,7 @@ function clearSection(sec) {
       surgState[p.code].crown = 0
       surgState[p.code].apptMode = "same"
       surgState[p.code].cashTopup = 0
+      surgState[p.code].remark = ""
       if(p.implantCrown) surgState[p.code].crownItems = [{sel:false,fee:0},{sel:false,fee:0}]
     })
   } else if (sec === 'nonsurg') {
@@ -671,7 +790,12 @@ function renderSurg(){
             <input type="number" min="1" max="20" value="${s.qty}" onchange="surgState['${p.code}'].qty=Math.max(1,parseInt(this.value)||1);render()">
           </div>`:""}
         </div>
-        ${s.on?`<div class="sep">${crownRows}</div>${totLine}`:""}
+        ${s.on?`<div class="sep">${crownRows}</div>${totLine}
+        <div class="sep"><div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
+          <input type="text" value="${s.remark||''}" placeholder="e.g. Stage 1 – Apr 2025…" style="flex:1;font-size:12px" oninput="surgState['${p.code}'].remark=this.value" onblur="render()">
+        </div></div>
+        <div style="padding-top:4px">${(s.crownItems||[]).some((ci)=>ci.sel&&parseFloat(ci.fee||0)>0)?`<button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}')">↓ Add to Summary</button>`:''}</div>`:""}
       `
       list.appendChild(div)
       return
@@ -785,7 +909,13 @@ function renderSurg(){
         <input class="fee" type="number" min="0" step="0.5" value="${s.cashTopup||0}" placeholder="0" style="width:90px" onchange="surgState['${p.code}'].cashTopup=this.value;render()">
         <span style="font-size:11px;color:var(--text-ter)">per unit · enter 0 if none</span>
       </div>` : ""}
-      ${lineTot}`
+      ${lineTot}
+      ${s.on?`<div class="sep"><div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
+        <input type="text" value="${s.remark||''}" placeholder="e.g. Stage 1 – Apr 2025, left side…" style="flex:1;font-size:12px" oninput="surgState['${p.code}'].remark=this.value" onblur="render()">
+      </div></div>
+      <div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}')">↓ Add to Summary</button></div>`:""}
+    `
     list.appendChild(div)
   })
 }
@@ -858,7 +988,9 @@ function renderNonSurg(){
             <input class="rem-input" type="number" min="0" max="99" value="${s.remaining}" onchange="nsState['${p.id}'].remaining=this.value;render()">
           </div>
         </div>`:""}
-      </div>${materialHtml}${lineTot}`
+      </div>${materialHtml}${lineTot}
+      ${s.on&&(parseFloat(s.fee)||0)>0?`<div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addNsToSummary('${p.id}')">↓ Add to Summary</button></div>`:""}
+    `
     list.appendChild(div)
   })
 }
@@ -887,14 +1019,13 @@ function updateNsSummary(){
   return {fee:gFee, sub:gSub, cash:gCash, total:gTotal}
 }
 
-function updateGrand(surg, ns, ortho, pro){
-  const sec     = document.getElementById("combined-summary")
+function updateGrand(){
+  const sec      = document.getElementById("combined-summary")
   const btnExcel = document.getElementById("btn-excel")
   const btnPrint = document.getElementById("btn-print")
-  const any = !!surg || !!ns || !!ortho || !!pro
-  btnExcel.disabled = !any; btnPrint.disabled = !any
-  if(!any){ sec.style.display="none"; return }
-  sec.style.display="block"
+
+  if(!summaryItems.length){ sec.style.display="none"; btnExcel.disabled=true; btnPrint.disabled=true; return }
+  sec.style.display="block"; btnExcel.disabled=false; btnPrint.disabled=false
 
   const tbody = document.getElementById("combined-tbody")
   tbody.innerHTML = ""
@@ -902,155 +1033,84 @@ function updateGrand(surg, ns, ortho, pro){
   const gn = hasGst ? "*" : ""
 
   const sectionStyles = {
-    "Surgical Procedures":    "background:var(--bg-info);color:var(--text-info)",
-    "Non-Surgical Procedures":"background:var(--bg-success);color:var(--text-success)",
-    "Orthodontics":           "background:#fde8f5;color:#9c27b0",
-    "Miscellaneous Procedures": "background:var(--bg-purple);color:var(--text-purple)",
+    "Surgical Procedures":     "background:var(--bg-info);color:var(--text-info)",
+    "Non-Surgical Procedures": "background:var(--bg-success);color:var(--text-success)",
+    "Orthodontics":            "background:var(--bg-ortho);color:var(--text-ortho)",
+    "Miscellaneous Procedures":"background:var(--bg-purple);color:var(--text-purple)",
   }
+  const SECTIONS = ["Surgical Procedures","Non-Surgical Procedures","Orthodontics","Miscellaneous Procedures"]
 
-  const addSection = (label, rows) => {
-    if(!rows.length) return
-    const style = sectionStyles[label] || "background:var(--bg-surface);color:var(--text-sec)"
+  let gMv=0, gChas=0, gCash=0, gTotal=0, gGstOnMv=0, totalInstEligible=0
+
+  SECTIONS.forEach(secName => {
+    const items = summaryItems.filter(i => i.section === secName)
+    if(!items.length) return
+    const style = sectionStyles[secName] || "background:var(--bg-surface);color:var(--text-sec)"
     const hdr = document.createElement("tr")
-    hdr.innerHTML = `<td colspan="6" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;${style};padding:6px 10px">${label}</td>`
+    hdr.innerHTML = `<td colspan="6" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;${style};padding:6px 10px">${secName}</td>`
     tbody.appendChild(hdr)
-    rows.forEach(r => tbody.appendChild(r))
-  }
 
-  // ── Surgical rows ──
-  const surgRows = []
-  SURG.filter(p=>surgState[p.code].on).forEach(p=>{
-    const s=surgState[p.code], l=getSurgLine(p)
-    let label = p.name
-    if(p.implantCrown){
-      const ci = s.crownItems||[]
-      const sel = p.crowns.filter((_,i)=>ci[i]&&ci[i].sel).map(c=>c.label)
-      if(sel.length) label += ` — ${sel.join(" + ")}`
-    }
-    if(p.implantMode && !p.implantOnly) label += ` — ${p.crowns[s.crown].label}`
-    if(p.implantMode && !p.implantOnly && s.apptMode==="diff") label += " (diff. appts)"
-    const cashStr = l.cashTotal>0 ? `<span class="cv">${fmtD(l.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
-    const mvStr = (p.feeOnly||p.implantCrown) ? `<span style="color:var(--text-ter)">—</span>` : `<span class="mv" style="font-weight:500">${fmt(l.mv)}</span>`
-    const feeTd = (p.feeOnly||p.implantCrown) ? fmtD(l.cashTotal) : fmtD(l.total)
-    const tr = document.createElement("tr")
-    tr.innerHTML = `
-      <td><div style="font-weight:500">${label}</div><div style="font-size:10px;color:var(--text-ter)">${p.tosp} · ${p.unit}</div></td>
-      <td>${l.qty}</td>
-      <td>${feeTd}</td>
-      <td>${mvStr}</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td>${cashStr}</td>`
-    surgRows.push(tr)
+    items.forEach(item => {
+      const calc = recalcItem(item)
+      gMv    += item.mv
+      gChas  += item.chas
+      gCash  += calc.cashTotal
+      gTotal += calc.total
+      gGstOnMv += calc.gstOnMv
+      totalInstEligible += calc.instEligible
+
+      const cashStr = calc.cashTotal>0 ? `<span class="cv">${fmtD(calc.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
+      const mvStr   = item.mv>0   ? `<span class="mv" style="font-weight:500">${fmt(item.mv)}</span>` : `<span style="color:var(--text-ter)">—</span>`
+      const subStr  = item.chas>0 ? `<span class="sv">${fmtD(item.chas)}</span>` : `<span style="color:var(--text-ter)">—</span>`
+      const tr = document.createElement("tr")
+      tr.innerHTML = `
+        <td>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-weight:500">${item.label}</span>
+            <button onclick="removeSummaryItem(${item.id})" class="no-print"
+              style="font-size:10px;line-height:1;padding:1px 5px;border:0.5px solid var(--border-md);border-radius:3px;background:var(--bg-surface);color:var(--text-ter);cursor:pointer;flex-shrink:0"
+              title="Remove">✕</button>
+          </div>
+          <div style="font-size:10px;color:var(--text-ter)">${item.sublabel}</div>
+        </td>
+        <td>${item.qty}</td>
+        <td>${fmtD(calc.displayFee)}</td>
+        <td>${mvStr}</td>
+        <td>${subStr}</td>
+        <td>${cashStr}</td>`
+      tbody.appendChild(tr)
+    })
   })
-  addSection("Surgical Procedures", surgRows)
-
-  // ── Non-surgical rows ──
-  const nsRows = []
-  NS.filter(p=>nsState[p.id].on).forEach(p=>{
-    const s=nsState[p.id], l=getNsLine(p)
-    const mats = p.hasMaterials && s.materials.length ? ` · ${s.materials.join("/")}` : ""
-    const subStr = l.subsidyTotal>0 ? `<span class="sv">${fmtD(l.subsidyTotal)}</span>` : `<span style="color:var(--text-ter)">—</span>`
-    const cashStr = l.cashTotal>0 ? `<span class="cv">${fmtD(l.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
-    const tr = document.createElement("tr")
-    tr.innerHTML = `
-      <td><div style="font-weight:500">${p.name}${mats}</div><div style="font-size:10px;color:var(--text-ter)">${p.unit}${l.subsidisedQty<l.qty?` · ${l.subsidisedQty}/${l.qty} subsidised`:""}</div></td>
-      <td>${l.qty}</td>
-      <td>${fmtD(l.totalFee)}</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td>${subStr}</td>
-      <td>${cashStr}</td>`
-    nsRows.push(tr)
-  })
-  addSection("Non-Surgical Procedures", nsRows)
-
-  // ── Orthodontics rows ──
-  const orthoRows = []
-  ORTHO.forEach(p=>{
-    const s=orthoState[p.id], fee=parseFloat(s.fee)||0
-    if(!fee) return
-    const total=fee*s.qty, cash=total*(hasGst?1.09:1.0)
-    const remark = s.remark ? `<div style="font-size:10px;color:var(--text-ter);font-style:italic">${s.remark}</div>` : ""
-    const tr = document.createElement("tr")
-    tr.innerHTML = `
-      <td><div style="font-weight:500">${p.name}</div>${remark}</td>
-      <td>${s.qty}</td>
-      <td>${fmtD(total)}</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td><span class="cv">${fmtD(cash)}${gn}</span></td>`
-    orthoRows.push(tr)
-  })
-  addSection("Orthodontics", orthoRows)
-
-  // ── Misc rows ──
-  const proRows = []
-  const gMult = hasGst ? 1.09 : 1.0
-  miscLines.forEach(line=>{
-    const fee=parseFloat(line.fee)||0
-    if(!fee) return
-    const total=fee*line.qty, cash=total*gMult
-    const label = line.name || "(Unnamed procedure)"
-    const remark = line.remark ? `<div style="font-size:10px;color:var(--text-ter);font-style:italic">${line.remark}</div>` : ""
-    const tr = document.createElement("tr")
-    tr.innerHTML = `
-      <td><div style="font-weight:500">${label}</div>${remark}</td>
-      <td>${line.qty}</td>
-      <td>${fmtD(total)}</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td style="color:var(--text-ter)">—</td>
-      <td><span class="cv">${fmtD(cash)}${gn}</span></td>`
-    proRows.push(tr)
-  })
-  addSection("Miscellaneous Procedures", proRows)
-
-  // ── Subtotal footer rows removed — grand total only ──
 
   // ── Grand totals ──
-  const gMv    = surg ? surg.mv    : 0
-  const gChas  = ns   ? ns.sub     : 0
-  const gCash  = (surg?surg.cash:0) + (ns?ns.cash:0) + (ortho?ortho.cash:0) + (pro?pro.cash:0)
-  const gTotal = (surg?surg.total:0) + (ns?ns.total:0) + (ortho?ortho.total:0) + (pro?pro.total:0)
-
-  // GST on Medisave — must be paid upfront, NOT instalment-eligible
-  const upfrontGstOnMv = surg && hasGst ? surg.gstOnMv : 0
-  // Instalment-eligible = cash top-up (+ its GST) + all NS cash + all prostho cash
-  // For surg: instEligible is returned from updateSurgSummary
-  const surgInstEligible  = surg  ? surg.instEligible : 0
-  const nsInstEligible    = ns    ? ns.cash            : 0
-  const orthoInstEligible = ortho ? ortho.balance       : 0  // balance after deposit
-  const proInstEligible   = pro   ? pro.cash           : 0
-  const totalInstEligible = surgInstEligible + nsInstEligible + orthoInstEligible + proInstEligible
-
   document.getElementById("cs-fee-total").textContent  = fmtD(gTotal)
   document.getElementById("cs-mv-total").textContent   = gMv   > 0 ? fmt(gMv)    : "—"
   document.getElementById("cs-chas-total").textContent = gChas > 0 ? fmtD(gChas) : "—"
   document.getElementById("cs-cash-total").innerHTML   = `${fmtD(gCash)}${hasGst?" <span style='font-size:10px'>(incl. GST)</span>":""}`
 
-  document.getElementById("gm-total").textContent    = fmtD(gTotal)
-  document.getElementById("gm-cash").textContent     = fmtD(gCash)
-  document.getElementById("gm-mv").textContent       = fmt(gMv)
-  document.getElementById("gm-chas").textContent     = fmtD(gChas)
+  document.getElementById("gm-total").textContent     = fmtD(gTotal)
+  document.getElementById("gm-cash").textContent      = fmtD(gCash)
+  document.getElementById("gm-mv").textContent        = fmt(gMv)
+  document.getElementById("gm-chas").textContent      = fmtD(gChas)
   document.getElementById("gm-total-sub").textContent = hasGst ? "incl. GST" : "before GST"
   document.getElementById("gm-cash-sub").textContent  = hasGst ? "incl. 9% GST" : "after Medisave + CHAS"
 
-  // GST on Medisave note
   const gstNote = document.getElementById("gst-mv-note")
   if(hasGst && gMv > 0){
     gstNote.style.display = "block"
-    const cashTopupGst = totalInstEligible - (totalInstEligible / 1.09)  // approximation for display
     document.getElementById("gn-mv-amt").textContent   = fmt(gMv)
-    document.getElementById("gn-mv-gst").textContent   = fmtD(upfrontGstOnMv)
-    document.getElementById("gn-cash-gst").textContent = fmtD(Math.max(0, gCash - upfrontGstOnMv - (gCash - upfrontGstOnMv)/1.09))
+    document.getElementById("gn-mv-gst").textContent   = fmtD(gGstOnMv)
+    document.getElementById("gn-cash-gst").textContent = fmtD(Math.max(0, gCash - gGstOnMv - (gCash - gGstOnMv)/1.09))
     document.getElementById("gn-cash-total").textContent = fmtD(gCash)
   } else {
     gstNote.style.display = "none"
   }
 
-  // Store for instalment calc
-  window._instEligible    = totalInstEligible
-  window._upfrontGstOnMv  = upfrontGstOnMv
+  window._instEligible   = totalInstEligible
+  window._upfrontGstOnMv = gGstOnMv
   updateInstalmentPanel()
 }
+
 
 function updateInstalmentPanel(){
   const tog = document.getElementById("instalment-toggle")
@@ -1142,7 +1202,7 @@ function renderOrtho(){
       ${fee > 0 ? `<div class="sep line-tot">
         <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
         <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
-      </div>` : ""}`
+      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addOrthoToSummary('${p.id}')">↓ Add to Summary</button></div>` : ""}`
     list.appendChild(div)
   })
 }
@@ -1206,7 +1266,7 @@ function renderProstho(){
       ${fee > 0 ? `<div class="sep line-tot">
         <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
         <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
-      </div>` : ""}`
+      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addMiscToSummary(${idx})">↓ Add to Summary</button></div>` : ""}`
     list.appendChild(div)
   })
   // + Add row button
@@ -1240,11 +1300,7 @@ function render(){
   renderNonSurg()
   renderOrtho()
   renderProstho()
-  const surg  = updateSurgSummary()
-  const ns    = updateNsSummary()
-  const ortho = updateOrthoSummary()
-  const pro   = updateProsthoSummary()
-  updateGrand(surg, ns, ortho, pro)
+  updateGrand()
 }
 
 // ── PRINT ────────────────────────────────────────────────────────────────────
@@ -1261,83 +1317,42 @@ function exportExcel(){
   const g       = gst()
   const chasLabel= {none:"None",orange:"CHAS Orange",blue:"CHAS Blue",mg:"Merdeka Generation",pg:"Pioneer Generation"}[chasMode]
 
+  if(!summaryItems.length){ alert("No items in summary — add procedures first."); return }
+
   const rows = [
-    ["DENTAL TREATMENT QUOTATION"],
+    ["WE DENTAL CLINIC — TREATMENT QUOTATION"],
     [],
     ["Patient Name:", patient],
     ["Doctor:", doctor],
     ["Date:", today],
-    ["CHAS Tier:", chasLabel],
     ["GST:", g ? "9% applied to cash component only" : "Not applied"],
     ["Note:", "Medisave amounts are maximum claimable, subject to CPF/MOH approval."],
     [],
-    ["━━ SURGICAL PROCEDURES (Medisave-claimable) ━━"],
-    ["Code","Procedure","Crown Type","Appointment","TOSP","Qty","Unit","Medisave/Unit","Cash/Unit (before GST)","Extra Misc","Total Medisave","Total Cash"+(g?" (w/ GST)":""),"Line Total"],
+    ["Treatment","Notes","Qty","Total Fee","Medisave","CHAS","Cash Payable"+(g?" (w/ GST)":"")],
   ]
-  let sMv=0,sCash=0,sTotal=0
-  SURG.filter(p=>surgState[p.code].on).forEach(p=>{
-    const s=surgState[p.code], l=getSurgLine(p)
-    sMv+=l.mv; sCash+=l.cashTotal; sTotal+=l.total
-    let crownLbl="N/A", apptLbl=s.apptMode==="same"?"Same appointment":"Different appointments"
-    let mvPer=0, cashPer=0
-    if(p.implantCrown){
-      const ci = s.crownItems||[]
-      crownLbl = p.crowns.filter((_,i)=>ci[i]&&ci[i].sel).map((c,i)=>`${c.label}($${parseFloat(ci[i]?ci[i].fee:0)||0})`).join("+")
-      mvPer=0; cashPer=l.cashBefore/Math.max(1,s.qty); apptLbl="N/A"
-    } else if(p.implantOnly){
-      crownLbl="N/A (implant only)"
-      mvPer=s.apptMode==="same"&&s.qty===1?p.surgical+p.misc:p.surgical
-      cashPer=0
-    } else if(p.implantMode){
-      crownLbl=p.crowns[s.crown].label
-      mvPer=s.apptMode==="same"&&s.qty===1?p.surgical+p.misc:p.surgical
-      cashPer=p.crowns[s.crown].cash+(s.apptMode==="same"&&s.qty>1?p.misc:0)
-    } else { mvPer=p.medisave; cashPer=p.cash||0; apptLbl="N/A" }
-    const displayCode = p.code==="SB816M_IO"?"SB816M":p.code
-    rows.push([displayCode,p.name,crownLbl,apptLbl,p.tosp,l.qty,p.unit,mvPer,cashPer,l.extraMisc||"",l.mv,l.cashTotal,l.total])
+
+  const SECTIONS = ["Surgical Procedures","Non-Surgical Procedures","Orthodontics","Miscellaneous Procedures"]
+  let gMv=0,gChas=0,gCash=0,gTotal=0
+
+  SECTIONS.forEach(secName => {
+    const items = summaryItems.filter(i => i.section === secName)
+    if(!items.length) return
+    rows.push([`━━ ${secName.toUpperCase()} ━━`])
+    items.forEach(item => {
+      const calc = recalcItem(item)
+      gMv+=item.mv; gChas+=item.chas; gCash+=calc.cashTotal; gTotal+=calc.total
+      rows.push([item.label, item.sublabel, item.qty,
+        calc.displayFee,
+        item.mv>0?item.mv:"—",
+        item.chas>0?item.chas:"—",
+        calc.cashTotal])
+    })
   })
-  rows.push(["","","","","","","Surgical totals","","","",sMv,sCash,sTotal])
-  rows.push([])
-  rows.push(["━━ NON-SURGICAL PROCEDURES (CHAS-subsidised) ━━"])
-  rows.push(["Procedure","Material(s)","Unit","CHAS Tier","Fee/Unit","CHAS Subsidy/Unit","Qty","Remaining Claims","Subsidised Qty","Total Fee","Total CHAS Subsidy","Cash"+(g?" (w/ GST)":""),"Line Total"])
-  let nFee=0,nSub=0,nCash=0,nTotal=0
-  NS.filter(p=>nsState[p.id].on).forEach(p=>{
-    const s=nsState[p.id], l=getNsLine(p)
-    nFee+=l.totalFee; nSub+=l.subsidyTotal; nCash+=l.cashTotal; nTotal+=l.total
-    const mats = p.hasMaterials && s.materials.length ? s.materials.join(", ") : ""
-    rows.push([p.name,mats,p.unit,chasLabel,parseFloat(s.fee)||0,l.effectiveSub,l.qty,s.remaining,l.subsidisedQty,l.totalFee,l.subsidyTotal,l.cashTotal,l.total])
-  })
-  rows.push(["","","","","","","Non-surgical totals","","",nFee,nSub,nCash,nTotal])
-  rows.push([])
-  rows.push(["━━ ORTHODONTICS ━━"])
-  rows.push(["Item","Unit","Fee/Unit","Qty","Total Fee","Cash"+(g?" (w/ GST)":""),"Remarks"])
-  let oFee=0,oCash=0
-  const oMult=g?1.09:1
-  ORTHO.forEach(p=>{
-    const s=orthoState[p.id], fee=parseFloat(s.fee)||0
-    if(!fee) return
-    const tot=fee*s.qty, cash=tot*oMult
-    oFee+=tot; oCash+=cash
-    rows.push([p.name,p.unit,fee,s.qty,tot,cash,s.remark||""])
-  })
-  rows.push(["","","","Orthodontics totals",oFee,oCash,""])
-  rows.push([])
-  rows.push(["━━ MISCELLANEOUS PROCEDURES ━━"])
-  rows.push(["Treatment","Unit","Fee/Unit","Qty","Total Fee","Cash"+(g?" (w/ GST)":""),"Remarks"])
-  let pFee=0,pCash=0
-  const gMult=g?1.09:1
-  miscLines.forEach(line=>{
-    const fee=parseFloat(line.fee)||0
-    if(!fee) return
-    const tot=fee*line.qty, cash=tot*gMult
-    pFee+=tot; pCash+=cash
-    rows.push([line.name||"(Unnamed)","per unit",fee,line.qty,tot,cash,line.remark||""])
-  })
-  rows.push(["","","","Miscellaneous totals",pFee,pCash,""])
+
   rows.push([])
   rows.push(["GRAND TOTAL"])
-  rows.push(["Medisave",fmt(sMv),"CHAS",fmtD(nSub),"Cash",fmtD(sCash+nCash+oCash+pCash)+(g?" (incl. GST)":""),"Total",fmtD(sTotal+nTotal+oCash+pCash)])
-  if(g) rows.push(["* Cash columns include 9% GST. Medisave and CHAS subsidy columns are GST-exclusive."])
+  rows.push(["Medisave",fmt(gMv),"CHAS",fmtD(gChas),"Cash",fmtD(gCash)+(g?" (incl. GST)":""),"Total",fmtD(gTotal)])
+  if(g) rows.push(["* Cash columns include 9% GST."])
 
   const ws = XLSX.utils.aoa_to_sheet(rows)
   ws["!cols"]=[{wch:44},{wch:14},{wch:20},{wch:22},{wch:11},{wch:6},{wch:18},{wch:14},{wch:20},{wch:14},{wch:18},{wch:22},{wch:14}]
