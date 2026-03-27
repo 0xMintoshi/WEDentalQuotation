@@ -49,6 +49,15 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .btn{font-size:12px;padding:8px 16px;border:0.5px solid var(--border-md);background:var(--bg-card);color:var(--text-pri);border-radius:var(--r-md);cursor:pointer;font-family:inherit;font-weight:500}
 .btn:hover{background:var(--bg-surface)} .btn:disabled{opacity:.38;cursor:not-allowed}
 .btn-p{background:#1479b8;color:#fff;border-color:#1479b8}.btn-p:hover{background:#0f5f94}
+@keyframes toastIn{0%{opacity:0;transform:translateY(12px) scale(0.95)}
+  18%{opacity:1;transform:translateY(0) scale(1)}
+  75%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-6px) scale(0.97)}}
+#add-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:#1479b8;color:#fff;font-size:13px;font-weight:600;
+  padding:9px 22px;border-radius:24px;pointer-events:none;z-index:9999;
+  box-shadow:0 4px 18px rgba(20,121,184,0.38);display:none;white-space:nowrap;
+  animation:toastIn 1s ease forwards}
 .info-box{font-size:11px;background:var(--bg-info);color:var(--text-info);padding:8px 11px;border-radius:var(--r-md);margin-top:8px;line-height:1.6}
 .ptrow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);margin-bottom:10px}
 .ptlbl{font-size:12px;color:var(--text-sec);min-width:90px;flex-shrink:0;font-weight:500}
@@ -64,7 +73,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .tag-nonsurg{background:var(--bg-success);color:var(--text-success)}
 .tag-ortho{background:var(--bg-ortho);color:var(--text-ortho)}
 }
-.chas-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);margin-bottom:12px}
+.chas-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0 14px 0;margin-bottom:0}
 .chas-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid var(--border-md);background:var(--bg-surface);color:var(--text-sec);cursor:pointer;transition:all .12s;white-space:nowrap}
 .chas-btn.sel-none{border-color:var(--border-md);background:var(--bg-surface);color:var(--text-pri)}
 .chas-btn.sel-orange{border-color:#c07000;background:#fff7ed;color:#b06000}
@@ -119,6 +128,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
   </div>
 </div>
 
+<div id="add-toast">✓ Added to summary</div>
 <div class="wrap">
 
 <!-- Header -->
@@ -177,7 +187,6 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
   <button class="chas-btn"          id="chas-blue"   onclick="setChas('blue')"  >🔵 Blue</button>
   <button class="chas-btn"          id="chas-mg"     onclick="setChas('mg')"    >⭐ Merdeka Gen</button>
   <button class="chas-btn"          id="chas-pg"     onclick="setChas('pg')"    >🌟 Pioneer Gen</button>
-  <span style="font-size:10px;color:var(--text-ter);margin-left:4px">Applies to all selected procedures</span>
 </div>
 <div id="nonsurg-list"></div>
 </div>
@@ -272,6 +281,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
   <div id="gst-mv-note" style="display:none;font-size:11px;color:var(--text-sec);background:var(--bg-surface);border-radius:var(--r-md);padding:9px 14px;margin-bottom:12px;line-height:1.7">
     <span style="font-weight:600">GST breakdown: </span>
     GST on Medisave (<span id="gn-mv-amt"></span>) = <span id="gn-mv-gst" class="cv"></span> added to cash ·
+    GST on CHAS subsidy (<span id="gn-chas-amt"></span>) = <span id="gn-chas-gst" class="cv"></span> added to cash ·
     GST on cash top-up = <span id="gn-cash-gst" class="cv"></span> ·
     Total cash payable = <span id="gn-cash-total" class="cv" style="font-weight:600"></span>
   </div>
@@ -281,12 +291,12 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
       <input type="checkbox" id="instalment-toggle" onchange="updateInstalmentPanel()" style="width:15px;height:15px;accent-color:#1479b8;cursor:pointer">
       <label for="instalment-toggle" style="font-size:13px;font-weight:500;cursor:pointer">Show instalment plan</label>
-      <span style="font-size:11px;color:var(--text-ter)">(cash top-up + GST on cash top-up only)</span>
+      <span style="font-size:11px;color:var(--text-ter)">(cash top-up only, excl. GST on Medisave/CHAS)</span>
     </div>
     <div id="instalment-panel" style="display:none">
       <div id="inst-upfront-note" style="display:none;font-size:11px;color:var(--text-sec);background:var(--bg-surface);border-radius:var(--r-md);padding:8px 12px;margin-bottom:10px;line-height:1.6">
         <span style="font-weight:600;color:var(--text-cash)">⚠ Pay upfront on day of appointment: </span>
-        GST on Medisave amount = <span class="cv" style="font-weight:600" id="inst-upfront-amt"></span> — this is not eligible for instalment.
+        GST on Medisave + GST on CHAS = <span class="cv" style="font-weight:600" id="inst-upfront-amt"></span> — this is not eligible for instalment.
       </div>
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px">
         <span style="font-size:12px;color:var(--text-sec);font-weight:500">Instalment period</span>
@@ -307,7 +317,7 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
         <div class="metric" style="flex:1;min-width:140px">
           <div class="mlabel">Instalment-eligible amount</div>
           <div class="mval cv" id="inst-total">$0</div>
-          <div class="msub">cash top-up + GST on cash top-up</div>
+          <div class="msub">cash top-up + GST on cash top-up (excl. GST on Medisave/CHAS)</div>
         </div>
         <div class="metric" style="flex:1;min-width:140px;background:var(--bg-info)">
           <div class="mlabel" style="color:var(--text-info)">Monthly instalment</div>
@@ -439,17 +449,33 @@ let summaryItems = []
 
 function recalcItem(item){
   const g = gst()
-  const gstOnMv = item.hasMv && g ? item.mv * 0.09 : 0
+  const gstOnMv   = item.hasMv  && g ? item.mv   * 0.09 : 0
+  const gstOnChas = item.chas>0 && g ? item.chas * 0.09 : 0
   const cashTopupGst = item.cashTopupBase * (g ? 1.09 : 1.0)
-  const cashTotal = cashTopupGst + gstOnMv
+  // GST on Medisave + GST on CHAS both added to cash payable, neither instalment-eligible
+  const cashTotal = cashTopupGst + gstOnMv + gstOnChas
   const total = item.mv + item.chas + cashTotal
   const instEligible = Math.max(0, cashTopupGst - (item.deposit || 0))
   let displayFee
-  if(item.feeDisplayType === 'surgTotal')    displayFee = item.mv + cashTotal
-  else if(item.feeDisplayType === 'nsGross') displayFee = item.chas + item.cashTopupBase
+  if(item.feeDisplayType === 'surgTotal')     displayFee = item.mv + cashTotal
+  else if(item.feeDisplayType === 'nsGross')  displayFee = item.chas + item.cashTopupBase
   else if(item.feeDisplayType === 'preGross') displayFee = item.cashTopupBase
-  else                                        displayFee = cashTotal  // 'cashOnly'
-  return { gstOnMv, cashTopupGst, cashTotal, total, instEligible, displayFee }
+  else                                         displayFee = cashTotal  // 'cashOnly'
+  return { gstOnMv, gstOnChas, cashTopupGst, cashTotal, total, instEligible, displayFee }
+}
+
+function flashBtn(btn){
+  const t = document.getElementById('add-toast')
+  if(!t) return
+  t.style.display = 'none'
+  // force reflow then restart
+  void t.offsetWidth
+  t.style.display = 'block'
+  t.style.animation = 'none'
+  void t.offsetWidth
+  t.style.animation = 'toastIn 1s ease forwards'
+  clearTimeout(window._toastTimer)
+  window._toastTimer = setTimeout(() => { t.style.display = 'none' }, 1050)
 }
 
 function removeSummaryItem(id){
@@ -457,7 +483,7 @@ function removeSummaryItem(id){
   render()
 }
 
-function addSurgToSummary(pCode){
+function addSurgToSummary(pCode, btn){
   const p = SURG.find(x => x.code === pCode)
   if(!p) return
   const s = surgState[pCode]
@@ -472,6 +498,7 @@ function addSurgToSummary(pCode){
     if(s.apptMode==='diff') label += ' (diff. appts)'
   }
   const dispCode = pCode==='SB816M_IO'?'SB816M':pCode
+  if(btn) flashBtn(btn)
   summaryItems.push({
     id: Date.now()+Math.random(),
     section: 'Surgical Procedures',
@@ -488,13 +515,14 @@ function addSurgToSummary(pCode){
   render()
 }
 
-function addNsToSummary(pid){
+function addNsToSummary(pid, btn){
   const p = NS.find(x => x.id === pid)
   if(!p) return
   const s = nsState[pid]
   const l = getNsLine(p)
   const mats = p.hasMaterials && s.materials.length ? ` · ${s.materials.join('/')}` : ''
   const sub = l.subsidisedQty < l.qty ? ` · ${l.subsidisedQty}/${l.qty} subsidised` : ''
+  if(btn) flashBtn(btn)
   summaryItems.push({
     id: Date.now()+Math.random(),
     section: 'Non-Surgical Procedures',
@@ -511,13 +539,14 @@ function addNsToSummary(pid){
   render()
 }
 
-function addOrthoToSummary(pid){
+function addOrthoToSummary(pid, btn){
   const p = ORTHO.find(x => x.id === pid)
   if(!p) return
   const s = orthoState[pid]
   const fee = parseFloat(s.fee)||0
   const deposit = Math.min(parseFloat(s.deposit)||0, fee)
   const sub = (s.remark ? ` · ${s.remark}` : '') + (deposit > 0 ? ` · deposit $${deposit.toFixed(2)}` : '')
+  if(btn) flashBtn(btn)
   summaryItems.push({
     id: Date.now()+Math.random(),
     section: 'Orthodontics',
@@ -534,11 +563,12 @@ function addOrthoToSummary(pid){
   render()
 }
 
-function addMiscToSummary(idx){
+function addMiscToSummary(idx, btn){
   const line = miscLines[idx]
   if(!line) return
   const fee = parseFloat(line.fee)||0
   const total = fee * line.qty
+  if(btn) flashBtn(btn)
   summaryItems.push({
     id: Date.now()+Math.random(),
     section: 'Miscellaneous Procedures',
@@ -794,7 +824,7 @@ function renderSurg(){
           <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
           <input type="text" value="${s.remark||''}" placeholder="e.g. Stage 1 – Apr 2025…" style="flex:1;font-size:12px" oninput="surgState['${p.code}'].remark=this.value" onblur="render()">
         </div></div>
-        <div style="padding-top:4px">${(s.crownItems||[]).some((ci)=>ci.sel&&parseFloat(ci.fee||0)>0)?`<button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}')">↓ Add to Summary</button>`:''}</div>`:""}
+        <div style="padding-top:4px">${(s.crownItems||[]).some((ci)=>ci.sel&&parseFloat(ci.fee||0)>0)?`<button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}',this)">↓ Add to Summary</button>`:''}</div>`:""}
       `
       list.appendChild(div)
       return
@@ -913,7 +943,7 @@ function renderSurg(){
         <span style="font-size:11px;color:var(--text-sec);font-weight:500;flex-shrink:0">Remarks</span>
         <input type="text" value="${s.remark||''}" placeholder="e.g. Stage 1 – Apr 2025, left side…" style="flex:1;font-size:12px" oninput="surgState['${p.code}'].remark=this.value" onblur="render()">
       </div></div>
-      <div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}')">↓ Add to Summary</button></div>`:""}
+      <div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addSurgToSummary('${p.code}',this)">↓ Add to Summary</button></div>`:""}
     `
     list.appendChild(div)
   })
@@ -988,7 +1018,7 @@ function renderNonSurg(){
           </div>
         </div>`:""}
       </div>${materialHtml}${lineTot}
-      ${s.on&&(parseFloat(s.fee)||0)>0?`<div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addNsToSummary('${p.id}')">↓ Add to Summary</button></div>`:""}
+      ${s.on&&(parseFloat(s.fee)||0)>0?`<div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addNsToSummary('${p.id}',this)">↓ Add to Summary</button></div>`:""}
     `
     list.appendChild(div)
   })
@@ -1039,7 +1069,7 @@ function updateGrand(){
   }
   const SECTIONS = ["Surgical Procedures","Non-Surgical Procedures","Orthodontics","Miscellaneous Procedures"]
 
-  let gMv=0, gChas=0, gCash=0, gTotal=0, gGstOnMv=0, totalInstEligible=0
+  let gMv=0, gChas=0, gCash=0, gTotal=0, gGstOnMv=0, gGstOnChas=0, totalInstEligible=0
 
   SECTIONS.forEach(secName => {
     const items = summaryItems.filter(i => i.section === secName)
@@ -1055,7 +1085,8 @@ function updateGrand(){
       gChas  += item.chas
       gCash  += calc.cashTotal
       gTotal += calc.total
-      gGstOnMv += calc.gstOnMv
+      gGstOnMv   += calc.gstOnMv
+      gGstOnChas += calc.gstOnChas
       totalInstEligible += calc.instEligible
 
       const cashStr = calc.cashTotal>0 ? `<span class="cv">${fmtD(calc.cashTotal)}${gn}</span>` : `<span style="color:var(--text-ter)">—</span>`
@@ -1095,18 +1126,25 @@ function updateGrand(){
   document.getElementById("gm-cash-sub").textContent  = hasGst ? "incl. 9% GST" : "after Medisave + CHAS"
 
   const gstNote = document.getElementById("gst-mv-note")
-  if(hasGst && gMv > 0){
+  const hasGstOnSubsidies = hasGst && (gMv > 0 || gChas > 0)
+  if(hasGstOnSubsidies){
     gstNote.style.display = "block"
-    document.getElementById("gn-mv-amt").textContent   = fmt(gMv)
-    document.getElementById("gn-mv-gst").textContent   = fmtD(gGstOnMv)
-    document.getElementById("gn-cash-gst").textContent = fmtD(Math.max(0, gCash - gGstOnMv - (gCash - gGstOnMv)/1.09))
+    document.getElementById("gn-mv-amt").textContent    = fmt(gMv)
+    document.getElementById("gn-mv-gst").textContent    = fmtD(gGstOnMv)
+    const gn_chas_el = document.getElementById("gn-chas-amt")
+    const gn_cgst_el = document.getElementById("gn-chas-gst")
+    if(gn_chas_el) gn_chas_el.textContent = fmtD(gChas)
+    if(gn_cgst_el) gn_cgst_el.textContent = fmtD(gGstOnChas)
+    const cashTopupGstTotal = gCash - gGstOnMv - gGstOnChas
+    document.getElementById("gn-cash-gst").textContent  = fmtD(Math.max(0, cashTopupGstTotal - cashTopupGstTotal/1.09))
     document.getElementById("gn-cash-total").textContent = fmtD(gCash)
   } else {
     gstNote.style.display = "none"
   }
 
-  window._instEligible   = totalInstEligible
-  window._upfrontGstOnMv = gGstOnMv
+  // GST on Medisave + GST on CHAS are both upfront (not instalment-eligible)
+  window._instEligible      = totalInstEligible
+  window._upfrontGstOnMv    = gGstOnMv + gGstOnChas
   updateInstalmentPanel()
 }
 
@@ -1201,7 +1239,7 @@ function renderOrtho(){
       ${fee > 0 ? `<div class="sep line-tot">
         <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
         <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
-      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addOrthoToSummary('${p.id}')">↓ Add to Summary</button></div>` : ""}`
+      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addOrthoToSummary('${p.id}',this)">↓ Add to Summary</button></div>` : ""}`
     list.appendChild(div)
   })
 }
@@ -1265,7 +1303,7 @@ function renderProstho(){
       ${fee > 0 ? `<div class="sep line-tot">
         <span><span style="color:var(--text-sec)">Total fee: </span><span style="font-weight:600">${fmtD(total)}</span></span>
         <span><span style="color:var(--text-sec)">Cash: </span><span class="cv" style="font-weight:600">${fmtD(totalWithGst)}${gn}</span></span>
-      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addMiscToSummary(${idx})">↓ Add to Summary</button></div>` : ""}`
+      </div><div style="padding-top:4px"><button class="btn no-print" style="font-size:11px;padding:5px 16px;margin-top:8px;background:var(--bg-info);color:var(--text-info);border-color:var(--text-info);font-weight:600" onclick="addMiscToSummary(${idx},this)">↓ Add to Summary</button></div>` : ""}`
     list.appendChild(div)
   })
   // + Add row button
