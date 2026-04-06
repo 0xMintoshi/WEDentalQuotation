@@ -89,6 +89,27 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .climit{font-size:10px;color:var(--text-ter);font-style:italic;margin-top:2px}
 #sum-nonsurg{display:none}
 #summary-section{display:none}
+
+/* ── Treatment Timeline ── */
+.tl-vcard{background:var(--bg-card);border-radius:var(--r-lg);padding:11px 13px}
+.tl-dzone{min-height:42px;border:0.5px dashed var(--border-lt);border-radius:var(--r-md);padding:5px;display:flex;flex-direction:column;gap:4px;position:relative;transition:border-color .1s,background .1s;box-sizing:border-box;overflow:hidden}
+.tl-dzone.tl-empty::after{content:'drop here';font-size:11px;color:#bbb;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.tl-dzone.tl-over,.tl-uzone.tl-over{border:0.5px solid #1D9E75!important;background:#E1F5EE!important}
+.tl-pill{display:flex;align-items:center;gap:4px;font-size:11.5px;padding:5px 10px;border-radius:var(--r-md);cursor:grab;user-select:none;border:0.5px solid var(--border-lt);line-height:1.5;position:relative;box-sizing:border-box;width:100%}
+.tl-pill *{pointer-events:none}
+.tl-pill.tl-picked{opacity:.3;cursor:grabbing}
+.tl-pill.tl-in{background:var(--bg-card);color:var(--text-pri);border-color:var(--border-lt)}
+.tl-pill.tl-in:hover{border-color:var(--border-md);background:var(--bg-surface)}
+.tl-pill.tl-out{background:var(--bg-surface);color:var(--text-sec);border-color:var(--border-lt)}
+.tl-pill.tl-out:hover{border-color:var(--border-md)}
+.tl-pill .tl-pc{font-size:10.5px;opacity:.75}
+.tl-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;transform:rotate(2deg);font-size:11.5px;padding:3px 9px;border-radius:20px;background:#E1F5EE;color:#085041;border:1px solid #5DCAA5;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.tl-wrow{display:flex;align-items:center;gap:8px;padding:5px 0 5px 10px}
+.tl-wvline{width:1.5px;height:28px;background:var(--border-lt);flex-shrink:0}
+select.tl-ws{font-size:12px;padding:3px 5px;border:0.5px solid var(--border-lt);border-radius:4px;background:var(--bg-surface);color:inherit;cursor:pointer;min-width:52px}
+.tl-add-btn{width:100%;margin-top:10px;padding:8px;font-size:12px;color:#999;border:0.5px dashed var(--border-lt);border-radius:var(--r-md);background:none;cursor:pointer}
+.tl-add-btn:hover{background:var(--bg-surface)}
+@media(max-width:580px){.tl-layout{flex-direction:column!important}}
 @media print{
   body{background:#fff;color:#000;padding:.5rem}
   .no-print{display:none!important}
@@ -96,6 +117,18 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
   .card{border:1px solid #ccc;break-inside:avoid}
   .metric{background:#f5f5f5}
   .info-box{background:#e8f4fd;color:#0a4a80}
+  #tl-print-section{page-break-before:always;break-before:always}
+  .tl-dzone{border:none!important;padding:0!important;min-height:0;gap:3px!important}
+  .tl-pill{cursor:default!important;border:none!important;border-left:3px solid var(--pill-accent,#ccc)!important;border-radius:0!important;padding:4px 8px!important;background:transparent!important;font-size:11px!important}
+  .tl-pill.tl-out{display:none!important}
+  .tl-wait-interactive{display:none!important}
+  .tl-wait-text{display:inline!important;font-size:10px!important;color:#999!important;font-style:italic}
+  .tl-add-btn{display:none!important}
+  .tl-vcard select{-webkit-appearance:none;appearance:none;pointer-events:none;font-size:11px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:#555!important}
+  .tl-vcard > div:first-child{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tl-wrow{padding:3px 0 3px 14px!important}
+  .tl-wvline{height:20px!important}
+  .tl-vcard{break-inside:avoid;margin-bottom:6px!important}
 }
 </style>
 </head>
@@ -328,6 +361,54 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
     </div>
   </div>
 
+
+  <!-- Treatment Timeline — always new page when printed -->
+  <div id="tl-print-section">
+  <div style="background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);padding:12px 16px;margin-top:1rem;margin-bottom:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <input type="checkbox" id="tl-toggle" onchange="tlToggle()" style="width:15px;height:15px;accent-color:#1479b8;cursor:pointer">
+      <label for="tl-toggle" style="font-size:13px;font-weight:500;cursor:pointer">Show Treatment Timeline</label>
+    </div>
+    <div id="tl-panel" style="display:none">
+      <div class="no-print" style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:11.5px;color:#888;font-weight:500">Fee Type:</span>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="tl-show-fee" onchange="tlRender()" checked style="accent-color:#1479b8;cursor:pointer"> Total Fee
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="tl-show-mv" onchange="tlRender()" checked style="accent-color:#1479b8;cursor:pointer"> Medisave
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="tl-show-cash" onchange="tlRender()" checked style="accent-color:#1479b8;cursor:pointer"> Cash
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="tl-show-chas" onchange="tlRender()" checked style="accent-color:#1479b8;cursor:pointer"> CHAS
+        </label>
+      </div>
+      <div class="tl-layout" style="display:flex;gap:14px;align-items:flex-start">
+        <div id="tl-main" style="flex:1;min-width:0"></div>
+        <div class="no-print" style="width:210px;flex-shrink:0">
+          <div style="font-size:11.5px;font-weight:500;color:#888;margin-bottom:7px">Unassigned Treatments</div>
+          <div id="tl-uzone" class="tl-uzone" data-tl-zone="unassigned"
+            style="min-height:60px;background:var(--bg-surface);border:0.5px solid var(--border-lt);border-radius:var(--r-md);padding:8px;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;margin-bottom:10px">
+          </div>
+          <div style="font-size:11.5px;font-weight:500;color:#888;margin-bottom:6px">Add Generic Treatment</div>
+          <div style="display:flex;gap:5px;margin-bottom:6px">
+            <select id="tl-generic-sel" onchange="tlGenSelChange()" style="flex:1;font-size:11.5px;padding:4px 6px;border:0.5px solid var(--border-lt);border-radius:var(--r-sm);background:var(--bg-surface);color:var(--text-pri);cursor:pointer;min-width:0">
+              <option value="Stitches Removal">Stitches Removal</option>
+              <option value="Implant Crown Fabrication">Implant Crown Fabrication</option>
+              <option value="Implant Denture Fabrication">Implant Denture Fabrication</option>
+              <option value="__custom__">Custom…</option>
+            </select>
+            <button onclick="tlAddGeneric()" style="font-size:11.5px;padding:4px 9px;background:#1479b8;color:#fff;border:none;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:500;flex-shrink:0">+ Add</button>
+          </div>
+          <input type="text" id="tl-generic-custom" placeholder="Type treatment name…" style="display:none;width:100%;font-size:11.5px;padding:4px 7px;border:0.5px solid var(--border-lt);border-radius:var(--r-sm);background:var(--bg-card);color:var(--text-pri);margin-bottom:4px">
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
   <!-- Acknowledgement + Signature -->
   <div id="ack-block" style="margin-top:1.5rem;padding:1.25rem 1.5rem;border:0.5px solid var(--border-lt);border-radius:var(--r-lg);background:var(--bg-card)">
     <p id="ack-text" style="font-size:13px;color:var(--text-pri);line-height:1.7;margin-bottom:1.5rem">
@@ -372,6 +453,8 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 <script>
 // ── DATA ────────────────────────────────────────────────────────────────────
 
+const MV_SESSION_CAP = 5290  // CPF Medisave max per session (1 Apr 2025)
+
 const SURG = [
 
   { code:"SB816M_IO", name:"Dental Implant", tosp:"Table 2C",
@@ -384,7 +467,7 @@ const SURG = [
   { code:"SB802M", name:"Complex Sinus Lift", tosp:"Table 3A",
     medisave:2220, breakdown:"$1,390+$830 misc", unit:"per procedure" },
   { code:"SB813M", name:"Alveolectomy", tosp:"Table 2C",
-    medisave:1950, breakdown:"$1,120+$830 misc", unit:"per quadrant" },
+    surgical:1120, misc:830, miscOnce:true, breakdown:"$1,120+$830 misc (misc once/session)", unit:"per quadrant" },
   { code:"SF812T", name:"Surgical Tooth Removal — bone removal, no tooth division", tosp:"Table 1B",
     medisave:1250, breakdown:"$420 surgical + $830 misc", unit:"per tooth" },
   { code:"SF813T", name:"Surgical Tooth Removal — bone removal + tooth division", tosp:"Table 2C",
@@ -446,6 +529,300 @@ const ORTHO = [
 //   mv, chas, cashTopupBase, hasMv, deposit, feeDisplayType }
 // feeDisplayType: 'surgTotal' | 'nsGross' | 'preGross' | 'cashOnly'
 let summaryItems = []
+
+// ── TREATMENT TIMELINE ───────────────────────────────────────────────────────
+const TL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const _tlNow    = new Date()
+const _tlCurM   = _tlNow.getMonth()
+const _tlCurY   = _tlNow.getFullYear()
+
+function tlAddMonths(date, n){
+  let m = date.m + n, y = date.y
+  while(m > 11){ m -= 12; y++ }
+  while(m < 0) { m += 12; y-- }
+  return {m, y}
+}
+
+function tlDateOptions(selected){
+  let opts = ''
+  for(let delta = 0; delta <= 36; delta++){
+    let m = _tlCurM + delta, y = _tlCurY
+    while(m > 11){ m -= 12; y++ }
+    const sel = (selected && selected.m === m && selected.y === y) ? ' selected' : ''
+    opts += `<option value="${m}_${y}"${sel}>${TL_MONTHS[m]} ${y}</option>`
+  }
+  return opts
+}
+
+const TL_WK = ['','2','4','6','8']
+const TL_MO = ['','3','4','5','6','7','8']
+const TL_PASTELS = ['#a8c8e8','#a8d5b5','#d5b8e0','#f0c9a0','#f0a8b8','#a8d8d8']
+
+let tlVisits     = [{id:'v1', label:'Visit 1', tIds:[], date:{m:_tlCurM, y:_tlCurY}}]
+let tlWaits      = {}
+let tlUnassigned = []
+let tlDrag       = null
+let tlGenericItems = []
+let _tlGenId     = -1
+
+// Bridge: TL uses ._id; summaryItems use .id — map both
+function tlItem(id){
+  return summaryItems.find(i => i._id == id || i.id == id) || tlGenericItems.find(i => i._id == id)
+}
+
+function tlSync(){
+  const allIds   = summaryItems.map(i => i._id !== undefined ? i._id : i.id)
+  const genIds   = tlGenericItems.map(i => i._id)
+  const validIds = [...allIds, ...genIds]
+  const assigned = tlVisits.flatMap(v => v.tIds)
+  tlUnassigned   = tlUnassigned.filter(id => validIds.some(v => v == id))
+  tlVisits.forEach(v => { v.tIds = v.tIds.filter(id => validIds.some(v => v == id)) })
+  allIds.forEach(id => {
+    if(!assigned.some(a => a == id) && !tlUnassigned.some(u => u == id)) tlUnassigned.push(id)
+  })
+}
+
+function tlToggle(){
+  const tog   = document.getElementById('tl-toggle')
+  const panel = document.getElementById('tl-panel')
+  if(!tog || !panel) return
+  if(tog.checked){ tlSync(); panel.style.display='block'; tlRender() }
+  else panel.style.display='none'
+}
+
+function tlAddVisit(){
+  const nid  = 'v' + Date.now()
+  const prev = tlVisits[tlVisits.length-1]
+  tlWaits[prev.id+'_'+nid] = {w:'',m:''}
+  tlVisits.push({id:nid, label:'Visit '+(tlVisits.length+1), tIds:[], date:{...prev.date}})
+  tlRender()
+}
+
+function tlRemoveVisit(vid){
+  if(tlVisits.length <= 1) return
+  const idx = tlVisits.findIndex(v => v.id === vid)
+  tlUnassigned.push(...tlVisits[idx].tIds)
+  Object.keys(tlWaits).filter(k => k.split('_').includes(vid)).forEach(k => delete tlWaits[k])
+  if(idx > 0 && idx < tlVisits.length-1)
+    tlWaits[tlVisits[idx-1].id+'_'+tlVisits[idx+1].id] = {w:'',m:''}
+  tlVisits.splice(idx,1)
+  tlVisits.forEach((v,i) => v.label = 'Visit '+(i+1))
+  tlRender()
+}
+
+function tlSetVisitDate(vid, val){
+  const v = tlVisits.find(v => v.id === vid)
+  if(!v) return
+  const [m, y] = val.split('_').map(Number)
+  v.date = {m, y}
+  const idx = tlVisits.indexOf(v)
+  tlPropagateFrom(idx)
+  tlRender()
+}
+
+function tlPropagateFrom(fromIdx){
+  for(let i = fromIdx + 1; i < tlVisits.length; i++){
+    const prev = tlVisits[i-1]
+    const k    = prev.id + '_' + tlVisits[i].id
+    const wp   = tlWaits[k] || {w:'',m:''}
+    const addM = Math.round((parseInt(wp.w)||0) / 4) + (parseInt(wp.m)||0)
+    if(addM > 0) tlVisits[i].date = tlAddMonths(prev.date, addM)
+  }
+}
+
+function tlSetWait(key, field, val){
+  if(!tlWaits[key]) tlWaits[key]={w:'',m:''}
+  tlWaits[key][field] = val
+  const fromId = key.split('_')[0]
+  const fromIdx = tlVisits.findIndex(v => v.id === fromId)
+  if(fromIdx >= 0) tlPropagateFrom(fromIdx)
+  tlRender()
+}
+
+function tlWaitText(wp){
+  const parts=[]
+  if(wp.m) parts.push(wp.m+' Months')
+  if(wp.w) parts.push(wp.w+' Weeks')
+  return parts.length ? parts.join(' + ') : ''
+}
+
+function tlGenSelChange(){
+  const sel    = document.getElementById('tl-generic-sel')
+  const custom = document.getElementById('tl-generic-custom')
+  if(!sel || !custom) return
+  custom.style.display = sel.value === '__custom__' ? 'block' : 'none'
+}
+
+function tlAddGeneric(){
+  const sel    = document.getElementById('tl-generic-sel')
+  const custom = document.getElementById('tl-generic-custom')
+  if(!sel) return
+  const name = sel.value === '__custom__' ? (custom?.value.trim() || '') : sel.value
+  if(!name) return
+  const id = _tlGenId--
+  tlGenericItems.push({ _id: id, label: name, mv: 0, cashBefore: 0, subsidyTotal: 0 })
+  tlUnassigned.push(id)
+  if(custom) custom.value = ''
+  tlRender()
+}
+
+function tlPillCost(item){
+  const showFee  = document.getElementById('tl-show-fee')?.checked
+  const showMv   = document.getElementById('tl-show-mv')?.checked
+  const showCash = document.getElementById('tl-show-cash')?.checked
+  const showChas = document.getElementById('tl-show-chas')?.checked
+  const parts = []
+  if(showFee){
+    const fee = (item.cashTopupBase||item.cashBefore||0) + (item.mv||0) + (item.chas||item.subsidyTotal||0)
+    if(fee) parts.push(`<span class="tl-pc">$${Number.isInteger(fee)?fee:fee.toFixed(2)}</span>`)
+  }
+  if(showMv && item.mv)
+    parts.push(`<span class="tl-pc" style="color:#1479b8">MS $${Number.isInteger(item.mv)?item.mv:item.mv.toFixed(2)}</span>`)
+  if(showCash){
+    const cash = item.cashTopupBase||item.cashBefore||0
+    if(cash) parts.push(`<span class="tl-pc" style="color:#b06000">Cash $${Number.isInteger(cash)?cash:cash.toFixed(2)}</span>`)
+  }
+  if(showChas){
+    const chas = item.chas||item.subsidyTotal||0
+    if(chas) parts.push(`<span class="tl-pc" style="color:#2f6010">CHAS $${Number.isInteger(chas)?chas:chas.toFixed(2)}</span>`)
+  }
+  return parts.length ? ' ' + parts.join(' ') : ''
+}
+
+function tlPill(id, ctx, accentCol){
+  const item = tlItem(id)
+  if(!item) return ''
+  const cls = ctx==='unassigned' ? 'tl-out' : 'tl-in'
+  return `<span class="tl-pill ${cls}" id="tlp_${id}"
+    onmousedown="tlMouseDown(event,${id},'${ctx}')"
+    style="${accentCol?`--pill-accent:${accentCol}`:''}"
+  >${item.label}${tlPillCost(item)}</span>`
+}
+
+function tlWaitRow(key){
+  const wp = tlWaits[key]||{w:'',m:''}
+  const ms = TL_MO.map(o=>`<option value="${o}"${wp.m===o?' selected':''}>${o||''}</option>`).join('')
+  const ws = TL_WK.map(o=>`<option value="${o}"${wp.w===o?' selected':''}>${o||''}</option>`).join('')
+  return `<div class="tl-wrow">
+    <div class="tl-wvline"></div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <span class="tl-wait-interactive" style="display:flex;align-items:center;gap:5px">
+        <select class="tl-ws" onchange="tlSetWait('${key}','m',this.value)">${ms}</select>
+        <span style="font-size:12px;color:#888">Months</span>
+        <select class="tl-ws" onchange="tlSetWait('${key}','w',this.value)">${ws}</select>
+        <span style="font-size:12px;color:#888">Weeks</span>
+      </span>
+      <span class="tl-wait-text" id="tlwt_${key}" style="font-size:12px;color:#888;margin-left:8px">${tlWaitText(wp)}</span>
+    </div>
+  </div>`
+}
+
+function tlZoneAt(x, y){
+  if(tlDrag && tlDrag.ghost) tlDrag.ghost.style.display='none'
+  const el = document.elementFromPoint(x, y)
+  if(tlDrag && tlDrag.ghost) tlDrag.ghost.style.display=''
+  if(!el) return null
+  return el.closest('[data-tl-zone]')
+}
+
+function tlRender(){
+  let html=''
+  tlVisits.forEach((v,i) => {
+    if(i>0){
+      const k=tlVisits[i-1].id+'_'+v.id
+      if(!tlWaits[k]) tlWaits[k]={w:'',m:''}
+      html+='<div style="margin:10px 0">'+tlWaitRow(k)+'</div>'
+    }
+    const empty=v.tIds.length===0
+    const borderCol = TL_PASTELS[i % TL_PASTELS.length]
+    html+=`<div class="tl-vcard" style="border:2px solid ${borderCol};margin-bottom:4px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px 6px 12px;background:${borderCol}33;border-bottom:1px solid ${borderCol}66;margin:-11px -13px 10px -13px;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <select style="font-size:12px;font-weight:600;letter-spacing:.03em;padding:0;border:none;background:transparent;color:#444;cursor:pointer;min-width:90px;max-width:140px"
+          onchange="tlSetVisitDate('${v.id}',this.value)">${tlDateOptions(v.date)}</select>
+        ${tlVisits.length>1?`<button class="no-print" style="font-size:10px;color:#bbb;border:none;background:none;cursor:pointer;padding:2px 4px;border-radius:4px;flex-shrink:0;line-height:1" onclick="tlRemoveVisit('${v.id}')" onmouseover="this.style.color='#e24b4a'" onmouseout="this.style.color='#bbb'">✕</button>`:''}
+      </div>
+      <div class="tl-dzone${empty?' tl-empty':''}" id="tldz_${v.id}" data-tl-zone="${v.id}"
+        style="--card-accent:${borderCol}"
+      >${v.tIds.map(id=>tlPill(id,v.id,borderCol)).join('')}</div>
+    </div>`
+  })
+  html+=`<button class="tl-add-btn no-print" onclick="tlAddVisit()" style="margin-top:8px">+ add visit</button>`
+  document.getElementById('tl-main').innerHTML=html
+  const uz=document.getElementById('tl-uzone')
+  uz.innerHTML=tlUnassigned.length
+    ? tlUnassigned.map(id=>tlPill(id,'unassigned')).join('')
+    : '<span style="font-size:11px;color:#bbb">All treatments assigned ✓</span>'
+}
+
+function tlMouseDown(e, id, src){
+  if(e.button !== 0) return
+  e.preventDefault()
+  const item = tlItem(id)
+  if(!item) return
+  const ghost = document.createElement('span')
+  ghost.className = 'tl-ghost'
+  const cost = (item.cashTopupBase||item.cashBefore||0) + (item.mv||0)
+  ghost.textContent = item.label + (cost ? '  $'+(Number.isInteger(cost)?cost:cost.toFixed(2)) : '')
+  ghost.style.left = (e.clientX + 10) + 'px'
+  ghost.style.top  = (e.clientY + 10) + 'px'
+  document.body.appendChild(ghost)
+  const pill = document.getElementById('tlp_'+id)
+  if(pill) pill.classList.add('tl-picked')
+  tlDrag = { id, src, ghost }
+  document.body.style.userSelect = 'none'
+}
+
+document.addEventListener('mousemove', function(e){
+  if(!tlDrag) return
+  tlDrag.ghost.style.left = (e.clientX + 10) + 'px'
+  tlDrag.ghost.style.top  = (e.clientY + 10) + 'px'
+  const zone = tlZoneAt(e.clientX, e.clientY)
+  document.querySelectorAll('[data-tl-zone]').forEach(z => z.classList.remove('tl-over'))
+  if(zone) zone.classList.add('tl-over')
+})
+
+document.addEventListener('mouseup', function(e){
+  if(!tlDrag) return
+  document.body.style.userSelect = ''
+  const zone = tlZoneAt(e.clientX, e.clientY)
+  const { id, src } = tlDrag
+  tlDrag.ghost.remove()
+  tlDrag = null
+  document.querySelectorAll('[data-tl-zone]').forEach(z => z.classList.remove('tl-over'))
+  if(!zone){ tlRender(); return }
+  const zid = zone.dataset.tlZone
+  let insertBeforeId = null
+  if(zid !== 'unassigned'){
+    const tv = tlVisits.find(v => v.id === zid)
+    if(tv){
+      for(const tid of tv.tIds){
+        if(tid == id) continue
+        const el = document.getElementById('tlp_'+tid)
+        if(el){
+          const r = el.getBoundingClientRect()
+          if(e.clientY < r.top + r.height / 2){ insertBeforeId = tid; break }
+        }
+      }
+    }
+  }
+  if(src === 'unassigned') tlUnassigned = tlUnassigned.filter(i => i !== id)
+  else { const sv=tlVisits.find(v=>v.id===src); if(sv) sv.tIds=sv.tIds.filter(i=>i!==id) }
+  if(zid === 'unassigned'){
+    tlUnassigned.push(id)
+  } else {
+    const tv = tlVisits.find(v => v.id === zid)
+    if(tv){
+      if(insertBeforeId !== null){
+        const idx = tv.tIds.findIndex(i => i == insertBeforeId)
+        tv.tIds.splice(idx, 0, id)
+      } else {
+        tv.tIds.push(id)
+      }
+    }
+  }
+  tlRender()
+})
+// ── END TREATMENT TIMELINE ───────────────────────────────────────────────────
 
 function recalcItem(item){
   const g = gst()
@@ -592,7 +969,7 @@ const CHAS_IDX   = {none:-1,orange:0,blue:1,mg:2,pg:3}
 
 const surgState = {}
 SURG.forEach(p => {
-  surgState[p.code] = { on:false, qty:1, crown:0, apptMode:"same", cashTopup:0, remark:"" }
+  surgState[p.code] = { on:false, qty:1, crown:0, apptMode:"same", cashTopup:0, remark:"", capOverflowToCash:false, extraMiscToCash:false }
   if(p.implantCrown) surgState[p.code].crownItems = [{sel:false,fee:0},{sel:false,fee:0}]
 })
 
@@ -630,68 +1007,97 @@ function getChasSubsidy(p){
   return p.subs[idx]
 }
 
+// Returns: { qty, mv, gstOnMv, cashBefore, cashTotal, total, extraMisc, instEligible, capOverflow? }
 function getSurgLine(p){
   const s = surgState[p.code], qty = s.qty, hasGst = gst()
+
   if(p.implantCrown){
-    // Pure cash, no Medisave. Sum selected crown items.
     let totalFee = 0
     ;(s.crownItems||[]).forEach((ci,i)=>{ if(ci.sel) totalFee += (parseFloat(ci.fee)||0)*qty })
     const cashTotal = hasGst ? totalFee*1.09 : totalFee
     return { qty, mv:0, gstOnMv:0, cashBefore:totalFee, cashTotal, total:cashTotal, extraMisc:0, instEligible:cashTotal }
   }
+
   if(p.feeOnly){
     const cb = (parseFloat(s.cashTopup)||0) * qty
     const cashTotal = hasGst ? cb * 1.09 : cb
-    // No Medisave, so entire cash (incl. GST) is instalment-eligible
     return { qty, mv:0, gstOnMv:0, cashBefore:cb, cashTotal, total:cashTotal, extraMisc:0, instEligible:cashTotal }
   }
+
   if(p.implantMode){
     if(p.implantOnly){
-      const costPer = parseFloat(s.cashTopup)||0   // cashTopup field reused as costPerImplant
-      const totalFee = costPer * qty
-      // Medisave is always same-session logic (no appt toggle): 1120×qty + 830 once
-      const mv = p.surgical*qty + p.misc
+      const costPer        = parseFloat(s.cashTopup)||0
+      const totalFee       = costPer * qty
+      const surgicalRaw    = p.surgical * qty
+      const capOverflow    = Math.max(0, surgicalRaw - MV_SESSION_CAP)
+      const surgicalCapped = Math.min(surgicalRaw, MV_SESSION_CAP)
+      const mv = surgicalCapped + p.misc
       if(costPer === 0){
-        // No cost entered — show Medisave only, $0 cash
         const gstOnMv = hasGst ? mv * 0.09 : 0
-        return { qty, mv, gstOnMv, cashBefore:0, cashTotal:gstOnMv, total:mv+gstOnMv, extraMisc:0, instEligible:0 }
+        return { qty, mv, gstOnMv, cashBefore:0, cashTotal:gstOnMv, total:mv+gstOnMv, extraMisc:0, instEligible:0, capOverflow }
       }
-      // Total fee incl GST = costPer × qty × (1+GST)
       const totalFeeWithGst = hasGst ? totalFee * 1.09 : totalFee
-      // Cash = total fee (incl GST) - Medisave (Medisave is fixed, no GST deducted from it)
-      const cashTotal = Math.max(0, totalFeeWithGst - mv)
-      // GST on Medisave = portion of overall GST attributable to Medisave amount
-      const gstOnMv = hasGst ? mv * 0.09 : 0
-      // instEligible = cash - gstOnMv (cash top-up portion only)
-      const instEligible = Math.max(0, cashTotal - gstOnMv)
-      return { qty, mv, gstOnMv, cashBefore:Math.max(0,totalFee-mv), cashTotal, total:hasGst?totalFeeWithGst:totalFee, extraMisc:0, instEligible }
+      const cashTotal       = Math.max(0, totalFeeWithGst - mv)
+      const gstOnMv         = hasGst ? mv * 0.09 : 0
+      const instEligible    = Math.max(0, cashTotal - gstOnMv)
+      return { qty, mv, gstOnMv, cashBefore:Math.max(0,totalFee-mv), cashTotal, total:hasGst?totalFeeWithGst:totalFee, extraMisc:0, instEligible, capOverflow }
     }
-    const ccp = p.crowns[s.crown].cash
-    const extraCash = parseFloat(s.cashTopup)||0  // additional cash top-up per implant
+    // Implant + Crown
+    const ccp       = p.crowns[s.crown].cash
+    const extraCash = parseFloat(s.cashTopup)||0
     if(s.apptMode === "same"){
-      const mv = p.surgical*qty + p.misc
-      const extraMisc = p.misc*(qty-1)
-      const cashBefore = extraMisc + (ccp + extraCash)*qty
-      const gstOnMv = hasGst ? mv * 0.09 : 0
+      const surgicalRaw    = p.surgical * qty
+      const capOverflow    = Math.max(0, surgicalRaw - MV_SESSION_CAP)
+      const surgicalCapped = Math.min(surgicalRaw, MV_SESSION_CAP)
+      const mv             = surgicalCapped + p.misc
+      const extraMisc      = p.misc * (qty - 1)
+      const overflowCash   = s.capOverflowToCash ? capOverflow : 0
+      const cashBefore     = extraMisc + (ccp + extraCash)*qty + overflowCash
+      const gstOnMv        = hasGst ? mv * 0.09 : 0
       const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
-      const cashTotal = cashTopupWithGst + gstOnMv
-      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc, instEligible:cashTopupWithGst }
+      const cashTotal      = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc, instEligible:cashTopupWithGst, capOverflow }
     } else {
-      const mv = (p.surgical+p.misc)*qty
-      const cashBefore = (ccp + extraCash)*qty
-      const gstOnMv = hasGst ? mv * 0.09 : 0
+      const mv             = (p.surgical + p.misc) * qty
+      const cashBefore     = (ccp + extraCash) * qty
+      const gstOnMv        = hasGst ? mv * 0.09 : 0
       const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
-      const cashTotal = cashTopupWithGst + gstOnMv
-      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst }
+      const cashTotal      = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst, capOverflow:0 }
     }
-  } else {
-    const mv = p.medisave*qty
-    const cashBefore = (parseFloat(surgState[p.code].cashTopup)||0)*qty
-    const gstOnMv = hasGst ? mv * 0.09 : 0
-    const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
-    const cashTotal = cashTopupWithGst + gstOnMv
-    return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst }
   }
+
+  if(p.miscOnce){
+    const surgicalRaw    = p.surgical * qty
+    const capOverflow    = Math.max(0, surgicalRaw - MV_SESSION_CAP)
+    const surgicalCapped = Math.min(surgicalRaw, MV_SESSION_CAP)
+    if(s.apptMode === "same"){
+      const mv            = surgicalCapped + p.misc
+      const extraMisc     = p.misc * (qty - 1)
+      const overflowCash  = s.capOverflowToCash  ? capOverflow : 0
+      const extraMiscCash = (qty > 1 && s.extraMiscToCash) ? extraMisc : 0
+      const cashBefore    = extraMiscCash + (parseFloat(s.cashTopup)||0)*qty + overflowCash
+      const gstOnMv       = hasGst ? mv * 0.09 : 0
+      const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+      const cashTotal     = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc, instEligible:cashTopupWithGst, capOverflow }
+    } else {
+      const mv            = (p.surgical + p.misc) * qty
+      const cashBefore    = (parseFloat(s.cashTopup)||0) * qty
+      const gstOnMv       = hasGst ? mv * 0.09 : 0
+      const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+      const cashTotal     = cashTopupWithGst + gstOnMv
+      return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst, capOverflow:0 }
+    }
+  }
+
+  // Flat-rate Medisave (GBR, Sinus Lift, SF812T, SF813T)
+  const mv               = p.medisave * qty
+  const cashBefore       = (parseFloat(s.cashTopup)||0) * qty
+  const gstOnMv          = hasGst ? mv * 0.09 : 0
+  const cashTopupWithGst = hasGst ? cashBefore * 1.09 : cashBefore
+  const cashTotal        = cashTopupWithGst + gstOnMv
+  return { qty, mv, gstOnMv, cashBefore, cashTotal, total:mv+cashTotal, extraMisc:0, instEligible:cashTopupWithGst }
 }
 
 function getNsLine(p){
@@ -748,6 +1154,8 @@ function clearSection(sec) {
       surgState[p.code].apptMode = "same"
       surgState[p.code].cashTopup = 0
       surgState[p.code].remark = ""
+      surgState[p.code].capOverflowToCash = false
+      surgState[p.code].extraMiscToCash = false
       if(p.implantCrown) surgState[p.code].crownItems = [{sel:false,fee:0},{sel:false,fee:0}]
     })
   } else if (sec === 'nonsurg') {
@@ -858,19 +1266,31 @@ function renderSurg(){
         </div>
         <div class="info-box">${info}</div>`
     } else if(s.on && p.implantOnly){
-      const costPer = parseFloat(s.cashTopup)||0
+      const costPer    = parseFloat(s.cashTopup)||0
+      const surgRaw    = p.surgical * s.qty
+      const capOverflow = Math.max(0, surgRaw - MV_SESSION_CAP)
       let info = ""
       if(costPer === 0){
         info = s.qty===1
           ? `Single implant: Medisave = $1,120 + $830 misc = <strong>$1,950</strong>. Enter cost/implant below to calculate cash payable.`
-          : `${s.qty} implants: Medisave = $1,120 × ${s.qty} + $830 misc once = <strong>${fmt(l.mv)}</strong>. Enter cost/implant to calculate cash payable.`
+          : `${s.qty} implants: surgical = $1,120 × ${s.qty} = ${fmt(surgRaw)}${capOverflow>0?` — <span style="color:var(--text-cash)">session cap $${MV_SESSION_CAP} exceeded by ${fmt(capOverflow)}</span>`:""}. Medisave claimable: <strong>${fmt(l.mv)}</strong>. Enter cost/implant to calculate cash payable.`
       } else {
         const totalFee = costPer * s.qty
+        const capNote = capOverflow > 0
+          ? ` · <span style="color:var(--text-cash)">Cap overflow: ${fmt(capOverflow)}${s.capOverflowToCash?" added to cash":""}</span>`
+          : ""
         info = s.qty===1
-          ? `Cost: ${fmt(costPer)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}`
-          : `Cost: ${fmt(costPer)} × ${s.qty} = ${fmt(totalFee)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}`
+          ? `Cost: ${fmt(costPer)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}${capNote}`
+          : `Cost: ${fmt(costPer)} × ${s.qty} = ${fmt(totalFee)} · Medisave: ${fmt(l.mv)} · Cash payable: <strong>${fmtD(l.cashTotal)}</strong>${gst()?" (incl. 9% GST on total fee)":""}${capNote}`
       }
-      apptHtml = `<div class="info-box" style="margin-top:8px">${info}</div>`
+      const overflowRow = capOverflow > 0 ? `
+        <div class="sep" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+            <input type="checkbox" ${s.capOverflowToCash?"checked":""} onchange="surgState['${p.code}'].capOverflowToCash=this.checked;render()" style="accent-color:#1479b8">
+            <span>Add cap overflow (<span class="cv" style="font-weight:600">${fmt(capOverflow)}</span>) to patient cash</span>
+          </label>
+        </div>` : ""
+      apptHtml = `<div class="info-box" style="margin-top:8px">${info}</div>${overflowRow}`
     }
 
     let crownHtml = ""
