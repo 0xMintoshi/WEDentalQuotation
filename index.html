@@ -45,9 +45,9 @@ input[type=text]:focus,input[type=number]:focus,input.fee:focus{outline:2px soli
 .line-tot{display:flex;gap:18px;font-size:12px;flex-wrap:wrap}
 .sec-label{font-size:10px;color:var(--text-ter);text-transform:uppercase;letter-spacing:.1em;margin:0 0 8px}
 table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
-th{padding:8px 10px;text-align:right;font-weight:600;color:var(--text-sec);background:var(--bg-surface);border-bottom:0.5px solid var(--border-lt);font-size:11px}
-th:first-child,td:first-child{text-align:left}
-td{padding:9px 10px;text-align:right;border-top:0.5px solid var(--border-lt);vertical-align:top}
+th{padding:8px 10px;text-align:center;font-weight:600;color:var(--text-sec);background:var(--bg-surface);border-bottom:0.5px solid var(--border-lt);font-size:11px}
+th:first-child,td:first-child{text-align:left;vertical-align:top}
+td{padding:9px 10px;text-align:center;border-top:0.5px solid var(--border-lt);vertical-align:middle}
 tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font-weight:600}
 .mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:1.5rem}
 .metric{background:var(--bg-card);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow-sm)}
@@ -67,6 +67,8 @@ tfoot td{background:var(--bg-surface);border-top:1px solid var(--border-md);font
 .btn-add-summary{font-size:12px;padding:6px 18px;background:#0071E3;color:#fff;border:1px solid #0071E3;border-radius:var(--r-md);cursor:pointer;font-family:inherit;font-weight:600;transition:opacity .1s}
 .btn-add-summary:hover{opacity:.88}
 .btn-add-summary.flashing{animation:addFlash .7s ease-out}
+.sum-row .del-btn{opacity:.35;transition:opacity .15s,color .15s,background .15s;font-size:14px;line-height:1;background:none;border:none;cursor:pointer;padding:2px 5px;color:var(--text-ter);border-radius:var(--r-sm)}
+.sum-row .del-btn:hover{opacity:1;color:#e24b4a;background:rgba(226,75,74,.08)}
 .info-box{font-size:11px;background:var(--bg-info);color:var(--text-info);padding:8px 11px;border-radius:var(--r-md);margin-top:8px;line-height:1.6}
 .ptrow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);box-shadow:var(--shadow-sm);border-radius:var(--r-lg);margin-bottom:10px}
 .ptlbl{font-size:12px;color:var(--text-sec);min-width:90px;flex-shrink:0;font-weight:500}
@@ -302,15 +304,24 @@ select.tl-ws{font-size:11px;padding:2px 4px;border:none;background:transparent;c
 
   <div style="background:var(--bg-card);border:0.5px solid var(--border-lt);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px">
     <table>
+      <colgroup>
+        <col style="width:40%"><!-- Treatment -->
+        <col style="width:6%"> <!-- Qty -->
+        <col style="width:13%"><!-- Total Fee -->
+        <col style="width:13%"><!-- Medisave -->
+        <col style="width:11%"><!-- CHAS -->
+        <col style="width:13%"><!-- Cash Payable -->
+        <col style="width:4%" class="no-print"><!-- ✕ -->
+      </colgroup>
       <thead>
         <tr>
-          <th style="width:42%;text-align:left">Treatment</th>
-          <th style="width:5%">Qty</th>
-          <th style="width:13%">Total Fee</th>
-          <th style="width:13%">Medisave</th>
-          <th style="width:11%">CHAS</th>
-          <th style="width:14%">Cash Payable</th>
-          <th style="width:2%" class="no-print"></th>
+          <th style="text-align:left">Treatment</th>
+          <th>Qty</th>
+          <th>Total Fee</th>
+          <th>Medisave</th>
+          <th>CHAS</th>
+          <th>Cash</th>
+          <th class="no-print"></th>
         </tr>
       </thead>
       <tbody id="combined-tbody"></tbody>
@@ -1290,6 +1301,8 @@ function renderSurg(){
       ? `<span style="color:var(--text-ter)">No Medisave · Cash only · ${p.unit}</span>`
       : p.implantMode
       ? `Medisave: <span class="mv">$1,950</span> per implant`
+      : p.miscOnce
+      ? `Medisave: <span class="mv">${fmt(p.surgical + p.misc)}</span> ${p.unit} <span style="color:var(--text-ter);font-size:11px">(misc $${p.misc} once/session)</span>`
       : `Medisave: <span class="mv">${fmt(p.medisave)}</span> ${p.unit}`
         + ((parseFloat(surgState[p.code].cashTopup)||0) > 0
           ? ` &nbsp;·&nbsp; <span class="cv">Cash top-up: ${fmt(parseFloat(surgState[p.code].cashTopup))}/unit</span>`
@@ -1544,7 +1557,7 @@ function updateGrand(){
     if(!items.length) return
     const style = sectionStyles[secName] || "background:var(--bg-surface);color:var(--text-sec)"
     const hdr = document.createElement("tr")
-    hdr.innerHTML = `<td colspan="6" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;${style};padding:6px 10px">${secName}</td>`
+    hdr.innerHTML = `<td colspan="7" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;${style};padding:6px 10px">${secName}</td>`
     tbody.appendChild(hdr)
 
     items.forEach(item => {
@@ -1561,6 +1574,7 @@ function updateGrand(){
       const mvStr   = item.mv>0   ? `<span class="mv" style="font-weight:500">${fmt(item.mv)}</span>` : `<span style="color:var(--text-ter)">—</span>`
       const subStr  = item.chas>0 ? `<span class="sv">${fmtD(item.chas)}</span>` : `<span style="color:var(--text-ter)">—</span>`
       const tr = document.createElement("tr")
+      tr.className = "sum-row"
       tr.innerHTML = `
         <td>
           <div class="tx-name">${item.label}</div>
@@ -1571,9 +1585,9 @@ function updateGrand(){
         <td>${mvStr}</td>
         <td>${subStr}</td>
         <td>${cashStr}</td>
-        <td class="no-print" style="padding:4px"><button onclick="removeSummaryItem(${item.id})"
-          style="font-size:11px;line-height:1;padding:2px 6px;border:0.5px solid var(--border-md);border-radius:var(--r-sm);background:var(--bg-surface);color:var(--text-ter);cursor:pointer"
-          title="Remove">✕</button></td>`
+        <td class="no-print" style="text-align:center;padding:4px;vertical-align:middle">
+          <button onclick="removeSummaryItem(${item.id})" class="del-btn" title="Remove">✕</button>
+        </td>`
       tbody.appendChild(tr)
     })
   })
